@@ -39,7 +39,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class LimitedScheme Declaration
+                           Class NVDVTVDV Declaration
 \*---------------------------------------------------------------------------*/
 
 class NVDVTVDV
@@ -84,7 +84,7 @@ public:
 
             // Stabilise for division
             gradcf = stabilise(gradcf, VSMALL);
-            
+
             return 1 - 0.5*gradf/gradcf;
         }
 
@@ -114,9 +114,14 @@ public:
             }
 
             // Stabilise for division
-            gradf = stabilise(gradf, VSMALL);
+            //Changed to SMALL to prevent FPE.  OB, 14/Jan/2011
+            gradf = stabilise(gradf, SMALL);
 
-            return 2*(gradcf/gradf) - 1;
+            // New formulation.  Oliver Borm and Aleks Jemcov
+            // HJ, 13/Jan/2011
+            return max(2*(gradcf/gradf) - 1, 0);
+
+//             return 2*(gradcf/gradf) - 1;
         }
 };
 

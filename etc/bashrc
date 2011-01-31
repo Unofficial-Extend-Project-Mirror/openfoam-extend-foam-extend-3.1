@@ -50,6 +50,7 @@ foamInstall=$HOME/$WM_PROJECT
 # foamInstall=~$WM_PROJECT
 # foamInstall=/usr/local/$WM_PROJECT
 # foamInstall=/opt/$WM_PROJECT
+# foamInstall=/usr/lib
 #
 # END OF (NORMAL) USER EDITABLE PART
 ################################################################################
@@ -319,7 +320,7 @@ _foamSource $WM_PROJECT_DIR/etc/aliases.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview/bashrc
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview3/bashrc
-_foamSource $WM_PROJECT_DIR/etc/apps/ensight/bashrc
+# _foamSource $WM_PROJECT_DIR/etc/apps/ensight/bashrc
 
 
 # Clean environment paths again. Only remove duplicates

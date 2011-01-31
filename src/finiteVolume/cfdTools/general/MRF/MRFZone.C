@@ -189,7 +189,12 @@ void Foam::MRFZone::setMRFFaces()
 
     if (debug)
     {
-        faceSet internalFaces(mesh_, "internalFaces", labelHashSet(internalFaces_));
+        faceSet internalFaces
+        (
+            mesh_,
+            "internalFaces",
+            labelHashSet(internalFaces_)
+        );
         Pout<< "Writing " << internalFaces.size()
             << " internal faces in MRF zone to faceSet "
             << internalFaces.name() << endl;
@@ -247,8 +252,9 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
     {
         WarningIn("MRFZone(const fvMesh&, Istream&)")
             << "Ignoring entry 'patches'\n"
-            << "    By default all patches within the rotating region rotate.\n"
-            << "    Optionally supply excluded patches using 'nonRotatingPatches'."
+            << "    By default all patches within the rotating region rotate."
+            << nl << "    Optionally supply excluded patches using "
+            << "'nonRotatingPatches'."
             << endl;
     }
 
@@ -446,6 +452,47 @@ void Foam::MRFZone::absoluteFlux
     absoluteRhoFlux(rho, phi);
 }
 
+void Foam::MRFZone::faceU
+(
+    surfaceVectorField& zoneFaceU
+) const
+{
+    const surfaceVectorField& Cf = mesh_.Cf();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    // Internal faces
+    forAll(internalFaces_, i)
+    {
+        label facei = internalFaces_[i];
+        zoneFaceU[facei] = (Omega ^ (Cf[facei] - origin));
+    }
+
+    // Included patches
+    forAll(includedFaces_, patchi)
+    {
+        forAll(includedFaces_[patchi], i)
+        {
+            label patchFacei = includedFaces_[patchi][i];
+
+            zoneFaceU.boundaryField()[patchi][patchFacei] =
+                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+        }
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_, patchi)
+    {
+        forAll(excludedFaces_[patchi], i)
+        {
+            label patchFacei = excludedFaces_[patchi][i];
+
+            zoneFaceU.boundaryField()[patchi][patchFacei] =
+                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+        }
+    }
+}
 
 void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
 {
