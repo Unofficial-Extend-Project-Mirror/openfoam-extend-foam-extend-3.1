@@ -39,6 +39,7 @@ cmake_minimum_required (VERSION 2.8)
 
 PROJECT(OpenFOAM_1.6-ext)
 
+IF (NOT $ENV{FOAM_TEST_HARNESS_DIR} STREQUAL "")
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
 
@@ -216,3 +217,21 @@ ENDIF(BUILD_TESTING)
 
 # That's it.
 #
+
+ELSE (NOT $ENV{FOAM_TEST_HARNESS_DIR} STREQUAL "")
+
+SET(WE_ARE_HERE ${CMAKE_CURRENT_LIST_DIR}/..)
+
+SET(OF_CMAKE_PROJECT_VERSION "1.6-ext" CACHE STRING "Name as which this version is installed")
+
+SET(OF_CMAKE_SEPARATE_THIRDPARTY ON CACHE BOOL "ThirdParty-Direcory is NOT in WM_PROJECT_DIR")
+IF(OF_CMAKE_SEPARATE_THIRDPARTY)
+  SET(OF_CMAKE_THIRDPARTY_DIR ${WE_ARE_HERE}/ThirdParty-${OF_CMAKE_PROJECT_VERSION} CACHE PATH 
+    "The external ThirdParty-directory")
+ELSE(OF_CMAKE_SEPARATE_THIRDPARTY)
+  SET(OF_CMAKE_THIRDPARTY_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty)
+ENDIF ()
+
+configure_file(${OpenFOAM_1.6-ext_SOURCE_DIR}/etc/bashrc.in ${OpenFOAM_1.6-ext_BINARY_DIR}/etc/bashrc.test @ONLY)
+
+ENDIF (NOT $ENV{FOAM_TEST_HARNESS_DIR} STREQUAL "")
