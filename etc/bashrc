@@ -32,8 +32,25 @@
 #
 #------------------------------------------------------------------------------
 
+thisFile=$0
+if [ $thisFile == "bash" ]
+then
+    # this is for bash. zsh already knows the source-file
+    thisFile=${BASH_SOURCE[0]}
+fi
+
+etcDir=`dirname $thisFile`
+
 export WM_PROJECT=OpenFOAM
-export WM_PROJECT_VERSION=1.6-ext
+if [ -f $etcDir/bashrc.settings ]
+then
+    source $etcDir/bashrc.settings
+else
+    export WM_PROJECT_VERSION=1.6-ext
+fi
+
+unset thisFile
+unset etcDir
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
