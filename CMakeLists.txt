@@ -37,7 +37,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(OpenFOAM_1.5-dev)
+PROJECT(OpenFOAM_1.6-ext)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
