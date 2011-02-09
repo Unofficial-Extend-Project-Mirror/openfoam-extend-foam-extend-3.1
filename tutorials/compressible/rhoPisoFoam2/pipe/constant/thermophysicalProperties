@@ -1,0 +1,63 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:                                            |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+
+    location    "constant";
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+
+thermoType      realGasHThermo<pureRealFluidMixture<realGasSutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<aungierRedlichKwong>>>>>;
+mixture         CO2 1 44.01 73.773e5 304.13 0.22394 467.6 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801E-13 1.4792e-06 116;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasSutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<redlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasSutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<pengRobinson>>>>>;
+//mixture        CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasSutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<soaveRedlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasConstTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<aungierRedlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 467.6 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801E-13 1e-06 0.7;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasConstTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<redlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1e-06 0.7;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasConstTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<pengRobinson>>>>>;
+//mixture        CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1e-06 0.7;
+
+//thermoType      realGasHThermo<pureRealFluidMixture<realGasConstTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<soaveRedlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1e-06 0.7;
+
+
+
+// *********************************************************************************************************************** //
+//  Coefficients
+//   CO2			  	--> Name
+//   1
+//   44.01   				--> Molar Volume
+//   77.773e5 				--> critical pressure
+//   304.13 				--> critical temperatur
+//   0.22394 				--> acentric factor
+//   467.6     				--> critical density (only for aungier redlich kwong
+//   49436.5054 --> 2.849677801e-13 	--> 7 heat capacity polynomial coefficent's
+//   ....				--> two coefficent's for sutherland model or for the constTransport model
+// *********************************************************************************************************************** //
+//
+//    Nasa Heat Capacity Polynomial  (7.order polynominal) --> freely available for many fluids    
+//    --> paper title: NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species 
+//
+// ************************************************************************* //
