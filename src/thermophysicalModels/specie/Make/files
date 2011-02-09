@@ -3,6 +3,7 @@ specie = specie
 speciesTable = speciesTable
 equationOfState = equationOfState
 reactions = reaction/reactions
+realGas=realGas
 
 $(atomicWeights)/atomicWeights.C
 $(specie)/specie.C
@@ -11,5 +12,10 @@ $(equationOfState)/perfectGas/perfectGas.C
 $(reactions)/makeChemkinReactions.C
 $(reactions)/makeReactionThermoReactions.C
 $(reactions)/makeLangmuirHinshelwoodReactions.C
+
+$(realGas)/$(equationOfState)/aungierRedlichKwong/aungierRedlichKwong.C
+$(realGas)/$(equationOfState)/pengRobinson/pengRobinson.C
+$(realGas)/$(equationOfState)/redlichKwong/redlichKwong.C
+$(realGas)/$(equationOfState)/soaveRedlichKwong/soaveRedlichKwong.C
 
 LIB = $(FOAM_LIBBIN)/libspecie
