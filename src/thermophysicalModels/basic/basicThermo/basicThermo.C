@@ -150,6 +150,8 @@ void Foam::basicThermo::eBoundaryCorrection(volScalarField& e)
     }
 }
 
+//real Gas Boundary Conditions
+
 Foam::wordList Foam::basicThermo::hRealBoundaryTypes()
 {
     const volScalarField::GeometricBoundaryField& tbf = T_.boundaryField();
