@@ -47,6 +47,14 @@ Description
 
 #include "addToRunTimeSelectionTable.H"
 
+#include "redlichKwong.H"
+#include "pengRobinson.H"
+#include "aungierRedlichKwong.H"
+#include "soaveRedlichKwong.H"
+#include "realGasSpecieThermo.H"
+#include "nasaHeatCapacityPolynomial.H"
+#include "realGasSutherlandTransport.H"
+#include "realGasConstTransport.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -93,6 +101,88 @@ makeBasicMixture
     janafThermo,
     perfectGas
 );
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasSutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    redlichKwong
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasSutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    pengRobinson
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasSutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    aungierRedlichKwong
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasSutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasConstTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    redlichKwong
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasConstTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    pengRobinson
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasConstTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    aungierRedlichKwong
+);
+
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    realGasConstTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
