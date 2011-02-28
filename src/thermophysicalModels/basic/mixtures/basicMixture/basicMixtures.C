@@ -53,8 +53,7 @@ Description
 #include "soaveRedlichKwong.H"
 #include "realGasSpecieThermo.H"
 #include "nasaHeatCapacityPolynomial.H"
-#include "realGasSutherlandTransport.H"
-#include "realGasConstTransport.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -105,7 +104,7 @@ makeBasicMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasSutherlandTransport,
+    sutherlandTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     redlichKwong
@@ -115,7 +114,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasSutherlandTransport,
+    sutherlandTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     pengRobinson
@@ -125,7 +124,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasSutherlandTransport,
+    sutherlandTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     aungierRedlichKwong
@@ -135,7 +134,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasSutherlandTransport,
+    sutherlandTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     soaveRedlichKwong
@@ -146,7 +145,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasConstTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     redlichKwong
@@ -156,7 +155,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasConstTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     pengRobinson
@@ -166,7 +165,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasConstTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     aungierRedlichKwong
@@ -176,7 +175,7 @@ makeBasicRealFluidMixture
 makeBasicRealFluidMixture
 (
     pureMixture,
-    realGasConstTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     soaveRedlichKwong
