@@ -29,6 +29,9 @@ Description
     Container class for a set of MRFZones with the MRFZone member functions
     implemented to loop over the functions for each MRFZone.
 
+Author
+    Oliver Borm
+
 SourceFiles
     MRFZones.C
 
@@ -108,6 +111,13 @@ public:
                 fvVectorMatrix& UEqn
             ) const;
 
+            void addCoriolis
+            (
+                const volScalarField& rho,
+                const volVectorField& U,
+                volVectorField& rhoUFlux
+            ) const;
+
             //  Use for fluxes with prefactor fields, eg. density.
             //  For consistency, requires face-interpolated prefactor
             //  HJ. 12/Dec/2009
@@ -129,15 +139,32 @@ public:
 
 
 
+        //- Compute the relative velocity from the given absolute velocity
+        //  within the MRF region, this formulation prevents from summing up
+        //  fixedValue boundary conditions
+        void relativeVelocity
+        (
+            const volVectorField& U,
+            volVectorField& Urel
+        ) const;
+
         //- Make the given absolute velocity relative within the MRF region
-        void relativeVelocity(volVectorField& Uabs) const;
+        void relativeVelocity(volVectorField& U) const;
 
         //- Make the given relative velocity absolute within the MRF region
         void absoluteVelocity(volVectorField& Urel) const;
 
-
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;
+
+        //- Compute source term for volScalarFields
+        tmp<volScalarField> Su(const volScalarField& phi) const;
+
+        //- Compute source term for volVectorFields
+        tmp<volVectorField> Su(const volVectorField& phi) const;
+
+        //- Compute the angular velocity in the whole domain
+        tmp<volVectorField> omega() const;
 };
 
 

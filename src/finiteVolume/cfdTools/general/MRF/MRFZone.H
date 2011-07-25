@@ -32,6 +32,9 @@ Description
     The rotation of the MRF region is defined by an origin and axis of
     rotation and an angular speed.
 
+Author
+    Oliver Borm
+
 SourceFiles
     MRFZone.C
 
@@ -173,6 +176,23 @@ public:
         //- Add the Coriolis force contribution to the momentum equation
         void addCoriolis(const volScalarField& rho, fvVectorMatrix& UEqn) const;
 
+        //- Add the Coriolis force contribution to the momentum equation
+        void addCoriolis
+        (
+            const volScalarField& rho,
+            const volVectorField& U,
+            volVectorField& rhoUFlux
+        ) const;
+
+        //- Compute the relative velocity from the given absolute velocity
+        //  within the MRF region, this formulation prevents from summing up
+        //  fixedValue boundary conditions
+        void relativeVelocity
+        (
+            const volVectorField& U,
+            volVectorField& Urel
+        ) const;
+
         //- Make the given absolute velocity relative within the MRF region
         void relativeVelocity(volVectorField& U) const;
 
@@ -205,6 +225,24 @@ public:
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;
 
+        //- Compute source term for volScalarFields in each cellZone
+        void Su
+        (
+            const volScalarField& phi,
+            const volVectorField& gradPhi,
+            volScalarField& source
+        ) const;
+
+        //- Compute source term for volVectorFields in each cellZone
+        void Su
+        (
+            const volVectorField& phi,
+            const volTensorField& gradPhi,
+            volVectorField& source
+        ) const;
+
+        //- Set the angular velocity in each cellZone
+        void omega(volVectorField& source) const;
 
     // Ostream Operator
 

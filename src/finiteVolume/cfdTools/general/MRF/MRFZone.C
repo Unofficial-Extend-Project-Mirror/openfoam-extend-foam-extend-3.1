@@ -22,6 +22,9 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Author
+    Oliver Borm
+
 \*---------------------------------------------------------------------------*/
 
 #include "MRFZone.H"
@@ -189,12 +192,7 @@ void Foam::MRFZone::setMRFFaces()
 
     if (debug)
     {
-        faceSet internalFaces
-        (
-            mesh_,
-            "internalFaces",
-            labelHashSet(internalFaces_)
-        );
+        faceSet internalFaces(mesh_, "internalFaces", labelHashSet(internalFaces_));
         Pout<< "Writing " << internalFaces.size()
             << " internal faces in MRF zone to faceSet "
             << internalFaces.name() << endl;
@@ -252,9 +250,8 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
     {
         WarningIn("MRFZone(const fvMesh&, Istream&)")
             << "Ignoring entry 'patches'\n"
-            << "    By default all patches within the rotating region rotate."
-            << nl << "    Optionally supply excluded patches using "
-            << "'nonRotatingPatches'."
+            << "    By default all patches within the rotating region rotate.\n"
+            << "    Optionally supply excluded patches using 'nonRotatingPatches'."
             << endl;
     }
 
@@ -340,6 +337,105 @@ void Foam::MRFZone::addCoriolis
     {
         label celli = cells[i];
         Usource[celli] -= V[celli]*rho[celli]*(Omega ^ U[celli]);
+    }
+}
+
+
+void Foam::MRFZone::addCoriolis
+(
+    const volScalarField& rho,
+    const volVectorField& U,
+    volVectorField& rhoUFlux
+) const
+{
+    if (cellZoneID_ == -1)
+    {
+        return;
+    }
+
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const vector& Omega = Omega_.value();
+
+    forAll(cells, i)
+    {
+        label celli = cells[i];
+        rhoUFlux[celli] -= rho[celli]*(Omega ^ U[celli]);
+    }
+
+    // Included patches
+    forAll(includedFaces_, patchi)
+    {
+        vectorField pfld(rhoUFlux.boundaryField()[patchi]);
+        const fvPatchVectorField& pU = U.boundaryField()[patchi];
+        const fvPatchScalarField& pRho = rho.boundaryField()[patchi];
+
+        forAll(includedFaces_[patchi], i)
+        {
+            label patchFacei = includedFaces_[patchi][i];
+
+            pfld[patchFacei] = pRho[patchFacei]*(Omega ^ pU[patchFacei]);
+        }
+
+        rhoUFlux.boundaryField()[patchi] -= pfld;
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_, patchi)
+    {
+        vectorField pfld(rhoUFlux.boundaryField()[patchi]);
+        const fvPatchVectorField& pU = U.boundaryField()[patchi];
+        const fvPatchScalarField& pRho = rho.boundaryField()[patchi];
+
+        forAll(excludedFaces_[patchi], i)
+        {
+            label patchFacei = excludedFaces_[patchi][i];
+
+            pfld[patchFacei] = pRho[patchFacei]*(Omega ^ pU[patchFacei]);
+        }
+
+        rhoUFlux.boundaryField()[patchi] -= pfld;
+    }
+}
+
+void Foam::MRFZone::relativeVelocity
+(
+    const volVectorField& U,
+    volVectorField& Urel
+) const
+{
+    const volVectorField& C = mesh_.C();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+
+    forAll(cells, i)
+    {
+        label celli = cells[i];
+        Urel[celli] = U[celli] - (Omega ^ (C[celli] - origin));
+    }
+
+    // Included patches
+    forAll(includedFaces_, patchi)
+    {
+        forAll(includedFaces_[patchi], i)
+        {
+            label patchFacei = includedFaces_[patchi][i];
+            Urel.boundaryField()[patchi][patchFacei] = vector::zero;
+        }
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_, patchi)
+    {
+        forAll(excludedFaces_[patchi], i)
+        {
+            label patchFacei = excludedFaces_[patchi][i];
+            Urel.boundaryField()[patchi][patchFacei] =
+                U.boundaryField()[patchi][patchFacei]
+                -(Omega ^ (C.boundaryField()[patchi][patchFacei] - origin));
+        }
     }
 }
 
@@ -517,5 +613,86 @@ void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
     }
 }
 
+void Foam::MRFZone::Su
+(
+    const volScalarField& phi,
+    const volVectorField& gradPhi,
+    volScalarField& source
+) const
+{
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const volVectorField& C = mesh_.C();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    forAll(cells, i)
+    {
+        source[cells[i]] =
+            (Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]];
+    }
+}
+
+void Foam::MRFZone::Su
+(
+    const volVectorField& phi,
+    const volTensorField& gradPhi,
+    volVectorField& source
+) const
+{
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const volVectorField& C = mesh_.C();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    forAll(cells, i)
+    {
+        source[cells[i]] =
+            ((Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]])
+            - (Omega ^ phi[cells[i]]);
+    }
+}
+
+void Foam::MRFZone::omega(volVectorField& source) const
+{
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+
+    forAll(cells, i)
+    {
+        source[cells[i]] = Omega_.value();
+    }
+
+    // Included patches
+    forAll(includedFaces_, patchi)
+    {
+        vectorField pfld(source.boundaryField()[patchi]);
+
+        forAll(includedFaces_[patchi], i)
+        {
+            label patchFacei = includedFaces_[patchi][i];
+
+            pfld[patchFacei] = vector::zero;
+        }
+
+        source.boundaryField()[patchi] == pfld;
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_, patchi)
+    {
+        vectorField pfld(source.boundaryField()[patchi]);
+
+        forAll(excludedFaces_[patchi], i)
+        {
+            label patchFacei = excludedFaces_[patchi][i];
+
+            pfld[patchFacei] = Omega_.value();
+        }
+
+        source.boundaryField()[patchi] == pfld;
+    }
+
+}
 
 // ************************************************************************* //

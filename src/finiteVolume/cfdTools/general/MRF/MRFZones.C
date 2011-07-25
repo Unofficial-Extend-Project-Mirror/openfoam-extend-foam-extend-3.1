@@ -22,11 +22,15 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Author
+    Oliver Borm
+
 \*---------------------------------------------------------------------------*/
 
 #include "MRFZones.H"
 #include "Time.H"
 #include "fvMesh.H"
+#include "fvCFD.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -153,6 +157,19 @@ void Foam::MRFZones::addCoriolis
 }
 
 
+void Foam::MRFZones::addCoriolis
+(
+    const volScalarField& rho,
+    const volVectorField& U,
+    volVectorField& rhoUFlux
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).addCoriolis(rho, U, rhoUFlux);
+    }
+}
+
 void Foam::MRFZones::relativeFlux
 (
     const surfaceScalarField& rho,
@@ -175,6 +192,22 @@ void Foam::MRFZones::absoluteFlux
     forAll(*this, i)
     {
         operator[](i).absoluteFlux(rho, phi);
+    }
+}
+
+
+void Foam::MRFZones::relativeVelocity
+(
+    const volVectorField& U,
+    volVectorField& Urel
+) const
+{
+    Urel = U;
+    Urel.correctBoundaryConditions();
+
+    forAll(*this, i)
+    {
+        operator[](i).relativeVelocity(U,Urel);
     }
 }
 
@@ -205,5 +238,102 @@ void Foam::MRFZones::correctBoundaryVelocity(volVectorField& U) const
     }
 }
 
+Foam::tmp<Foam::volScalarField> Foam::MRFZones::Su
+(
+    const volScalarField& phi
+) const
+{
+    tmp<volScalarField> tPhiSource
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                phi.name() + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("zero", phi.dimensions()/dimTime, 0),
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+    volScalarField& source = tPhiSource();
+
+    volVectorField gradPhi = fvc::grad(phi);
+
+    forAll(*this, i)
+    {
+        operator[](i).Su(phi, gradPhi, source);
+    }
+
+    return tPhiSource;
+}
+
+
+Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
+(
+    const volVectorField& phi
+) const
+{
+    tmp<volVectorField> tPhiSource
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                phi.name() + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedVector("zero", phi.dimensions()/dimTime, vector::zero),
+            zeroGradientFvPatchVectorField::typeName
+        )
+    );
+    volVectorField& source = tPhiSource();
+
+    volTensorField gradPhi = fvc::grad(phi);
+
+    forAll(*this, i)
+    {
+        operator[](i).Su(phi, gradPhi, source);
+    }
+
+    return tPhiSource;
+}
+
+Foam::tmp<Foam::volVectorField> Foam::MRFZones::omega() const
+{
+    tmp<volVectorField> tPhiSource
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                "angularVelocity",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedVector("zero", dimless/dimTime, vector::zero),
+            fixedValueFvPatchVectorField::typeName
+        )
+    );
+    volVectorField& source = tPhiSource();
+
+    forAll(*this, i)
+    {
+        operator[](i).omega(source);
+    }
+
+    return tPhiSource;
+}
 
 // ************************************************************************* //
