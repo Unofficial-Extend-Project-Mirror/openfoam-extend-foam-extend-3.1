@@ -99,3 +99,35 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  #--------------------------------------------------------------------------
  # 
 Binary files ParMGridGen-1.0_orig/mgridgen and ParMGridGen-1.0/mgridgen differ
+diff --git ParMGridGen-1.0/MGridGen/IMlib/IMlib.h ParMGridGen-1.0/MGridGen/IMlib/IMlib.h
+--- ParMGridGen-1.0/MGridGen/IMlib/IMlib.h
++++ ParMGridGen-1.0/MGridGen/IMlib/IMlib.h
+@@ -43,8 +43,12 @@
+ #ifdef DMALLOC
+ #include <dmalloc.h>
+ #else
++#if defined __APPLE__ && defined __MACH__
++#include <sys/malloc.h>
++#else
+ #include <malloc.h>
+ #endif
++#endif
+ 
+ /*************************************************************************
+ * Data structure definition section
+diff --git ParMGridGen-1.0/MGridGen/Lib/mgridgen.h ParMGridGen-1.0/MGridGen/Lib/mgridgen.h
+--- ParMGridGen-1.0/MGridGen/Lib/mgridgen.h
++++ ParMGridGen-1.0/MGridGen/Lib/mgridgen.h
+@@ -26,8 +26,12 @@
+ #ifdef DMALLOC
+ #include <dmalloc.h>
+ #else
++#if defined __APPLE__ && defined __MACH__
++#include <sys/malloc.h>
++#else
+ #include <malloc.h>
+ #endif
++#endif
+ 
+ #include "defs.h"
+ #include "struct.h"
