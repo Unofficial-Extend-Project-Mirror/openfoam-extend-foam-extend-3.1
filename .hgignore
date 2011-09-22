@@ -85,3 +85,12 @@ testHarness/OpenFOAM/1.6-ext/runDir/CTestTestfile.cmake
 testHarness/OpenFOAM/1.6-ext/runDir/DartConfiguration.tcl
 testHarness/OpenFOAM/1.6-ext/runDir/Makefile
 testHarness/OpenFOAM/1.6-ext/runDir/cmake_install.cmake
+
+# Thirdparty-stuff
+ThirdParty/rpmBuild/BUILD/*
+ThirdParty/rpmBuild/SOURCES/*.gz
+ThirdParty/rpmBuild/TGZS/*
+ThirdParty/rpmBuild/tmp/*
+ThirdParty/rpmBuild/RPMS/*
+ThirdParty/rpmBuild/SOURCES/wget-log
+ThirdParty/rpmBuild/rpmDB/*
