@@ -1,0 +1,4 @@
+general/swakExpressionFunctionObject.C
+patch/patchExpressionFunctionObject.C
+
+LIB = $(FOAM_LIBBIN)/libsimpleSwakFunctionObjects

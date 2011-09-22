@@ -1,0 +1,45 @@
+#! /bin/sh
+
+(export WM_NCOMPPROCS= ; wmake libso swak4FoamParsers)
+
+wmake libso groovyBC
+
+wmake libso swakFunctionObjects
+
+unset WE_HAVE_SIMPLE_FUNCTION_OBJECTS
+
+if [ -d simpleFunctionObjects ]; then 
+    WE_HAVE_SIMPLE_FUNCTION_OBJECTS=1
+    
+    wmake libso simpleFunctionObjects
+else
+    if [ -d "$WM_PROJECT_USER_DIR/Libraries/simpleFunctionObjects/lnInclude" ]; then 
+	WE_HAVE_SIMPLE_FUNCTION_OBJECTS=1
+    fi
+fi
+
+if [ "$WE_HAVE_SIMPLE_FUNCTION_OBJECTS" ]; then
+    wmake libso simpleSwakFunctionObjects
+else
+    echo "\n   simpleSwakFunctionObjects not compiled because no simpleFunctionObjects installation found\n"
+fi
+
+unset WE_HAVE_SIMPLE_FUNCTION_OBJECTS
+
+wmake libso swakTopoSources
+
+wmake libso swakSourceFields
+
+if [ "$FOAM_DEV" != "" ]
+then
+    (export WM_NCOMPPROCS= ; wmake libso swakFiniteArea)
+fi
+
+wmake libso groovyStandardBCs
+
+if [ "$SWAK_PYTHON_INCLUDE" != "" ]
+then
+    wmake libso pythonIntegration
+else
+    echo "SWAK_PYTHON_INCLUDE not defined .... no Python-Integration"
+fi

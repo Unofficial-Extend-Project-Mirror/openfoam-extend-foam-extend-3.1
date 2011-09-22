@@ -1,0 +1,233 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application oodles;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.1;
+
+deltaT          1e-05;
+
+writeControl    timeStep;
+
+writeInterval   10;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression compressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+(
+    probes1
+    {
+        // Type of functionObject
+        type probes;
+
+        outputControl   timeStep;
+        outputInterval  1;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libsampling.so");
+
+        // Locations to be probed. runTime modifiable!
+        probeLocations
+        (
+            (0.0254 0.0253 0.0)
+            (0.0508 0.0253 0.0)
+            (0.0762 0.0253 0.0)
+            (0.1016 0.0253 0.0)
+            (0.1270 0.0253 0.0)
+            (0.1524 0.0253 0.0)
+            (0.1778 0.0253 0.0)
+        );
+
+        // Fields to be probed. runTime modifiable!
+        fields
+        (
+            p
+        );
+    }
+
+    fieldAverage1
+    {
+        // Type of functionObject
+        type fieldAverage;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        outputControl   outputTime;
+
+        // Fields to be  averaged - runTime modifiable
+        fields
+        (
+            U
+            {
+                mean            on;
+                prime2Mean      on;
+                base            time;
+            }
+            p
+            {
+                mean            on;
+                prime2Mean      on;
+                base            time;
+            }
+        );
+    }
+    kineticEnergyExpression
+    {
+        type expressionField;
+        outputControl timeStep;
+        outputInterval 1;
+        fieldName kineticEnergy;
+        expression "U&U+k";
+        autowrite true;        
+    }
+    kineticOut
+    {
+        type patchExpression;
+        accumulations (
+            min max sum average
+        );
+        patches (
+            inlet 
+            outlet
+            upperWall
+            lowerWall
+        );
+        expression "U&U+k*phi";
+        verbose true;
+    }
+    sumKineticOut
+    {
+        type patchExpression;
+        accumulations (
+            sum
+        );
+        patches (
+            inlet 
+            outlet
+        );
+        expression "mag(Sf())*(U&U+k*phi)";
+        verbose true;
+    }
+    deltaP
+    {
+        type patchExpression;
+        accumulations (
+            min max average
+        );
+        patches (
+            inlet 
+        );
+        variables "pOut{outlet}=average(p);";
+        //        variables "pOut{}=average(p);";
+        //        variables "pOut{patch'outlet/nowhere}=average(p);";
+        expression "p-pOut";
+        verbose true;
+    }
+    deltaPAverage
+    {
+        type patchExpression;
+        accumulations (
+            min max average
+        );
+        patches (
+            outlet 
+        );
+        variables "pAverage{}=sum(p*vol())/sum(vol());";
+        expression "pAverage-p";
+        verbose true;
+    }
+    massFlowSimple
+    {
+        // Just for checking whether tha othr massflow is correct
+        type patchMassFlow;
+        patches (
+            inlet 
+            outlet
+        );
+        verbose true;
+    }
+    massFlowSwak
+    {
+        type patchExpression;
+        verbose true;
+        accumulations (
+            sum
+        );
+        patches (
+            inlet 
+            outlet
+        );
+        expression "phi";
+    }
+    massFlowSwak2
+    {
+        type patchExpression;
+        verbose true;
+        accumulations (
+            sum
+        );
+        patches (
+            inlet 
+            outlet
+        );
+        expression "U&Sf()";
+    }
+    fixdedK
+    {
+        type manipulateField;
+        expression "1e-5";
+        mask "mag(pos().y)<0.01 && pos().x>0.1 && pos().x<0.12";
+        fieldName k;
+        outputControl timeStep;
+        outputInterval 1;
+    }
+    clearKinetic
+    {
+        type clearExpressionField;
+        outputControl timeStep;
+        outputInterval 1;
+        fieldName kineticEnergy;
+    }
+);
+
+libs ( 
+    "libOpenFOAM.so" 
+    "libgroovyBC.so" 
+    "libgroovyStandardBCs.so" 
+    "libsimpleSwakFunctionObjects.so" 
+    "libswakFunctionObjects.so" 
+) ;
+
+// ************************************************************************* //

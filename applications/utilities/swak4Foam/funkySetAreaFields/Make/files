@@ -1,0 +1,3 @@
+funkySetAreaFields.C
+
+EXE = $(FOAM_APPBIN)/funkySetAreaFields

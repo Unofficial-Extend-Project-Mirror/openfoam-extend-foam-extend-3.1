@@ -1,0 +1,3 @@
+interFoamWithSources.C
+
+EXE = $(FOAM_APPBIN)/interFoamWithSources

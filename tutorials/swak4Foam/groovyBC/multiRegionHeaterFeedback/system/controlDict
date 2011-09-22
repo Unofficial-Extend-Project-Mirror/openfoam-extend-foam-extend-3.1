@@ -1,0 +1,112 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     chtMultiRegionFoam;
+
+startFrom       latestTime;
+
+startTime       0.001;
+
+stopAt          endTime;
+
+endTime         200;
+
+deltaT          0.001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   5;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  8;
+
+writeCompression compressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+maxCo           0.3;
+
+// Maximum diffusion number
+maxDi           10.0;
+
+adjustTimeStep  yes;
+
+functions
+(
+    tempOut{
+        type patchExpression;
+        accumulations (
+            min max average
+        );
+        patches (maxX);
+        region topAir;
+        expression "T";
+        verbose true;
+    }
+    tempIn{
+        type patchExpression;
+        accumulations (
+            min max average
+        );
+        patches (minY);
+        region bottomAir;
+        expression "T";
+        verbose true;
+    }
+    energyRegionheater{
+        type swakExpression;
+        region heater;
+        expression "vol()*T*cp*rho";
+        accumulations ( sum );
+        valueType internalField;
+        verbose true;
+    }
+    energyRegionAir{
+        type swakExpression;
+        region topAir;
+        variables "bottomE{/bottomAir}=sum(h*vol());";
+        expression "sum(h*vol())+bottomE";
+        accumulations ( average );
+        valueType internalField;
+        verbose true;
+    }
+    energyRegionSolid{
+        type swakExpression;
+        region leftSolid;
+        variables "rightE{/rightSolid}=sum(T*cp*rho*vol());";
+        expression "sum(T*cp*rho*vol())+rightE";
+        accumulations ( average );
+        valueType internalField;
+        verbose true;
+    }
+);
+
+libs (
+    "libgroovyBC.so"  
+    "libsimpleSwakFunctionObjects.so" 
+    "libswakFunctionObjects.so" 
+    "libgroovyStandardBCs.so"
+);
+
+// ************************************************************************* //

@@ -94,3 +94,6 @@ ThirdParty/rpmBuild/tmp/*
 ThirdParty/rpmBuild/RPMS/*
 ThirdParty/rpmBuild/SOURCES/wget-log
 ThirdParty/rpmBuild/rpmDB/*
+
+#swak4Foam stuff
+src/swak4Foam/*/*.output

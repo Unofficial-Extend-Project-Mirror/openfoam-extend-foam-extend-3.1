@@ -1,0 +1,16 @@
+#! /bin/sh
+
+wmake all $FOAM_SRC/swak4Foam
+
+wmake funkySetFields
+
+wmake funkySetBoundaryField
+
+wmake replayTransientBC
+
+if [ "$FOAM_DEV" != "" ]
+then
+    wmake funkySetAreaFields
+fi
+
+wmake funkyDoCalc

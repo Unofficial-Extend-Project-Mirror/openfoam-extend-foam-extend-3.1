@@ -1,0 +1,11 @@
+#! /bin/sh
+
+wclean funkySetFields
+
+wclean funkySetBoundaryField
+
+wclean replayTransientBC
+
+wclean funkySetAreaFields
+
+wclean funkyDoCalc

@@ -1,0 +1,5 @@
+groovyBCCommons.C
+groovyBCFvPatchFields.C
+groovyBCPointPatchFields.C
+
+LIB = $(FOAM_LIBBIN)/libgroovyBC
