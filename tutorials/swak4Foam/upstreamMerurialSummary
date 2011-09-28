@@ -1,6 +1,6 @@
-parent: 555:b6b5ae544bfa tip
- Added the Winner of the swak4Foam-competition from the Workshop
+parent: 568:21d59f2f8593 tip
+ Fix a nasty bug that breaks parallel runs with variables
 branch: default
-commit: 1 modified, 269 unknown
+commit: 269 unknown (clean)
 update: (current)
 mq:     (empty queue)

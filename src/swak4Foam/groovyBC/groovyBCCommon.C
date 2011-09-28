@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id$ 
+ ICE Revision: $Id: groovyBCCommon.C,v b434ec03bd35 2011-09-23 15:01:21Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "groovyBCCommon.H"
@@ -132,9 +132,9 @@ void groovyBCCommon<Type>::write(Ostream& os) const
     if(hasGradient_) {
         os.writeKeyword("gradientExpression")
             << gradientExpression_ << token::END_STATEMENT << nl;
+        os.writeKeyword("fractionExpression")
+            << fractionExpression_ << token::END_STATEMENT << nl;
     }
-    os.writeKeyword("fractionExpression")
-        << fractionExpression_ << token::END_STATEMENT << nl;
 
     // debug_ not written on purpose
 }

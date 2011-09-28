@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SampledSetValueExpressionDriver.C,v b9535a87c984 2011-04-11 09:35:09Z bgschaid $ 
+ ICE Revision: $Id: SampledSetValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "SampledSetValueExpressionDriver.H"
@@ -139,7 +139,7 @@ bool SampledSetValueExpressionDriver::update()
 {
     bool updated=false; // nu update in sampledSet
     if(debug) {
-        Info << "Updated: " << updated << " " << this->size() << endl;
+        Pout << "Updated: " << updated << " " << this->size() << endl;
     }
 
     return updated;

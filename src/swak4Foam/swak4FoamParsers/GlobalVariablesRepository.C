@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: GlobalVariablesRepository.C,v e6329119f8a6 2011-08-20 20:54:24Z bgschaid $ 
+ ICE Revision: $Id: GlobalVariablesRepository.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "GlobalVariablesRepository.H"
@@ -61,11 +61,11 @@ GlobalVariablesRepository &GlobalVariablesRepository::getGlobalVariables()
     GlobalVariablesRepository*  ptr=repositoryInstance;
     
     if(debug) {
-        Info << "GlobalVariablesRepository: asking for Singleton" << endl;
+        Pout << "GlobalVariablesRepository: asking for Singleton" << endl;
     }
 
     if(ptr==NULL) {
-        Info << "swak4Foam: Allocating new repository for sampledGlobalVariables\n";
+        Pout << "swak4Foam: Allocating new repository for sampledGlobalVariables\n";
 
         ptr=new GlobalVariablesRepository();
     }
@@ -101,7 +101,7 @@ const ExpressionResult &GlobalVariablesRepository::get(
         const ResultTable &scope=globalVariables_[scopeName];
         if(scope.found(name)) {
             if(debug) {
-                Info << name << " ( " << scopeName << " )= " << scope[name] << endl;
+                Pout << name << " ( " << scopeName << " )= " << scope[name] << endl;
             }
             return scope[name];
         }
@@ -131,7 +131,7 @@ void GlobalVariablesRepository::addValue(
 {
     if(!globalVariables_.found(scope)) {
         if(debug) {
-            Info << "Creating global scope " << scope << endl;
+            Pout << "Creating global scope " << scope << endl;
         }
         globalVariables_.insert(scope,ResultTable());
     }

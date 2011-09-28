@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: CellSetValueExpressionDriver.C,v 5c09ed50ab2c 2011-05-08 19:21:51Z bgschaid $ 
+ ICE Revision: $Id: CellSetValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "CellSetValueExpressionDriver.H"
@@ -199,7 +199,7 @@ vectorField *CellSetValueExpressionDriver::makeFaceAreaField()
 bool CellSetValueExpressionDriver::update()
 {
     if(debug) {
-        Info << "CellSet: update " << cellSet_->name() 
+        Pout << "CellSet: update " << cellSet_->name() 
             << endl;
     }
 

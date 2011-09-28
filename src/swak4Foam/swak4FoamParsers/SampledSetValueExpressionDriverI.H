@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SampledSetValueExpressionDriverI.H,v b9535a87c984 2011-04-11 09:35:09Z bgschaid $ 
+ ICE Revision: $Id: SampledSetValueExpressionDriverI.H,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -63,11 +63,11 @@ namespace Foam {
     Field<Type> *SampledSetValueExpressionDriver::sampleOrInterpolateInternal(const word &name)
     {
         if(debug) {
-            Info << "Sampling set: " << name << " on set " 
+            Pout << "Sampling set: " << name << " on set " 
                 << this->theSet_.name() << " with " << this->size() 
                 << " points" << endl; 
-            //            this->theSet_.write(Info);
-            Info << "Search memory: " << this->searchInMemory()
+            //            this->theSet_.write(Pout);
+            Pout << "Search memory: " << this->searchInMemory()
                 << " Field there: " << this->mesh().foundObject<volField>(name)
                 << " Is variable: " << this->variables_.found(name)
                 << endl;
@@ -109,7 +109,7 @@ namespace Foam {
                         );
                 }                
                 if(debug) {
-                    Info << "Interpolated values: " << values << endl;
+                    Pout << "Interpolated values: " << values << endl;
                 }
             } else {
                 result=new Field<Type>(this->theSet_.size());
@@ -121,7 +121,7 @@ namespace Foam {
                     values[samplei] = field[samples.cells()[samplei]];
                 }                
                 if(debug) {
-                    Info << "Values: " << values << endl;
+                    Pout << "Values: " << values << endl;
                 }
             }
         } else {

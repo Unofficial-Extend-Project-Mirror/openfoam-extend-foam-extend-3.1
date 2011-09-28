@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: swakRegistryProxySurface.C,v 85b4e25bdb23 2011-04-26 08:59:38Z bgschaid $ 
+ ICE Revision: $Id: swakRegistryProxySurface.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "swakRegistryProxySurface.H"
@@ -53,7 +53,7 @@ namespace Foam
 // {
 //     if (debug)
 //     {
-//         Info<< "swakRegistryProxySurface::createGeometry() - doing nothing" 
+//         Pout<< "swakRegistryProxySurface::createGeometry() - doing nothing" 
 //             << endl;
 //     }
 // }
@@ -103,7 +103,7 @@ bool Foam::swakRegistryProxySurface::needsUpdate() const
     bool originalUpdate=realSurface().needsUpdate();
 
     if(debug) {
-        Info << "Foam::swakRegistryProxySurface::needsUpdate(): " << originalUpdate << endl;
+        Pout << "Foam::swakRegistryProxySurface::needsUpdate(): " << originalUpdate << endl;
     }
 
     return originalUpdate;
@@ -115,7 +115,7 @@ bool Foam::swakRegistryProxySurface::expire()
     bool originalExpire=realSurface().expire();
 
     if(debug) {
-        Info << "Foam::swakRegistryProxySurface::expire(): " << originalExpire << endl;
+        Pout << "Foam::swakRegistryProxySurface::expire(): " << originalExpire << endl;
     }
 
     return originalExpire;
@@ -134,13 +134,13 @@ bool Foam::swakRegistryProxySurface::update()
         this->magSf().size() != realSurface().magSf().size()
     ) {
         if(debug) {
-            Info << "Foam::swakRegistryProxySurface::update(): Clearin Geometry" << endl;
+            Pout << "Foam::swakRegistryProxySurface::update(): Clearin Geometry" << endl;
         }
         clearGeom();
     }
 
     if(debug) {
-        Info << "Foam::swakRegistryProxySurface::update(): " << originalUpdate << endl;
+        Pout << "Foam::swakRegistryProxySurface::update(): " << originalUpdate << endl;
     }
     return originalUpdate;
 }

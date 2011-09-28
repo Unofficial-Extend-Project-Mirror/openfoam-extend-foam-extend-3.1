@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SampledSurfaceValueExpressionDriver.C,v 85b4e25bdb23 2011-04-26 08:59:38Z bgschaid $ 
+ ICE Revision: $Id: SampledSurfaceValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "SampledSurfaceValueExpressionDriver.H"
@@ -142,7 +142,7 @@ bool SampledSurfaceValueExpressionDriver::update()
 {
     bool updated=theSurface_.update(); // valgrind reports huge memory losses here
     if(debug) {
-        Info << "Updated: " << updated << " " << this->size() << endl;
+        Pout << "Updated: " << updated << " " << this->size() << endl;
     }
 
     return updated;
@@ -211,7 +211,7 @@ scalarField *SampledSurfaceValueExpressionDriver::makeCellVolumeField()
 scalarField *SampledSurfaceValueExpressionDriver::makeFaceAreaMagField()
 {
     if(debug) {
-        Info << "SampledSurfaceValueExpressionDriver::makeFaceAreaMagField()"
+        Pout << "SampledSurfaceValueExpressionDriver::makeFaceAreaMagField()"
             << " size: " << this->size() << " magSf: " << theSurface_.magSf().size() 
             << endl;
     }

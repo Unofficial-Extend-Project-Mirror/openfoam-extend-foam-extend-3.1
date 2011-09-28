@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: swakRegistryProxySet.C,v b9535a87c984 2011-04-11 09:35:09Z bgschaid $ 
+ ICE Revision: $Id: swakRegistryProxySet.C,v c01516f0dd98 2011-09-28 09:13:24Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "swakRegistryProxySet.H"
@@ -53,7 +53,7 @@ namespace Foam
 // {
 //     if (debug)
 //     {
-//         Info<< "swakRegistryProxySet::createGeometry() - doing nothing" 
+//         Pout<< "swakRegistryProxySet::createGeometry() - doing nothing" 
 //             << endl;
 //     }
 // }

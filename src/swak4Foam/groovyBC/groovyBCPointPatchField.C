@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: groovyBCPointPatchField.C,v 8167f6a9e2e0 2011-03-20 13:18:35Z bgschaid $ 
+ ICE Revision: $Id: groovyBCPointPatchField.C,v 90138ec97ef3 2011-09-26 18:42:41Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "groovyBCPointPatchField.H"
@@ -85,7 +85,7 @@ groovyBCPointPatchField<Type>::groovyBCPointPatchField
 :
     mixedPointPatchFieldType(p, iF),
     groovyBCCommon<Type>(dict,false,true),
-    driver_(getFvPatch(this->patch()))
+    driver_(dict,getFvPatch(this->patch()))
 {
     driver_.readVariablesAndTables(dict);
 

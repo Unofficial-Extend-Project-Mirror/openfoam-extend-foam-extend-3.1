@@ -1,4 +1,4 @@
-//  ICE Revision: $Id: FieldValueExpressionDriver.C,v 33be05bfb1af 2011-07-13 00:29:00Z bgschaid $ 
+//  ICE Revision: $Id: FieldValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
 
 #include "FieldValueExpressionDriver.H"
 #include <Random.H>
@@ -96,7 +96,7 @@ FieldValueExpressionDriver::~FieldValueExpressionDriver ()
 
 void FieldValueExpressionDriver::setScalarResult(volScalarField *r) {
     if(debug) {
-        Info << "FieldValueExpressionDriver::setScalarResult(volScalarField *r)" << endl;
+        Pout << "FieldValueExpressionDriver::setScalarResult(volScalarField *r)" << endl;
     }
 
     sresult_.reset(r);
@@ -110,7 +110,7 @@ void FieldValueExpressionDriver::setScalarResult(volScalarField *r) {
 
 void FieldValueExpressionDriver::setLogicalResult(volScalarField *r) {
     if(debug) {
-        Info << "FieldValueExpressionDriver::setLogicalResult(volScalarField *r)" << endl;
+        Pout << "FieldValueExpressionDriver::setLogicalResult(volScalarField *r)" << endl;
     }
 
     sresult_.reset(r);
@@ -121,7 +121,7 @@ void FieldValueExpressionDriver::setLogicalResult(volScalarField *r) {
 
 void FieldValueExpressionDriver::setVectorResult(volVectorField *r) {
     if(debug) {
-        Info << "FieldValueExpressionDriver::setVectorResult(volVectorField *r)" << endl;
+        Pout << "FieldValueExpressionDriver::setVectorResult(volVectorField *r)" << endl;
     }
 
     vresult_.reset(r);
