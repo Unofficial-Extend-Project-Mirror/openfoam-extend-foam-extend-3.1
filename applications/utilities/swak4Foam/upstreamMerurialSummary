@@ -1,6 +1,6 @@
-parent: 568:21d59f2f8593 tip
- Fix a nasty bug that breaks parallel runs with variables
+parent: 587:87e61f56d704 
+ Added tag release2011-10-03 for changeset d04acc89b2df
 branch: default
-commit: 269 unknown (clean)
+commit: 1101 unknown (clean)
 update: (current)
 mq:     (empty queue)
