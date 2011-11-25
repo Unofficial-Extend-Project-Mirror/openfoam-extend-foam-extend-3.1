@@ -97,63 +97,67 @@ void insertDiagSource
     m.addBoundaryDiag(diag, 0);
     m.addBoundarySource(source, false);
 
-    if (blockM.diag().activeType() == blockCoeffBase::UNALLOCATED)
+    switch (blockM.diag().activeType())
     {
-        blockM.diag().asScalar() = diag;
-    }
-    else if
-    (
-        blockM.diag().activeType() == blockCoeffBase::SCALAR
-     || blockM.diag().activeType() == blockCoeffBase::LINEAR
-    )
-    {
-        typename CoeffField<BlockType>::linearTypeField& blockDiag =
-            blockM.diag().asLinear();
-        
-        typedef typename CoeffField<BlockType>::linearType linearType;
+        case blockCoeffBase::UNALLOCATED:
+        {
+            blockM.diag().asScalar() = diag;
+            break;
+        }
+        case blockCoeffBase::SCALAR:
+        case blockCoeffBase::LINEAR:
+        {
+            typename CoeffField<BlockType>::linearTypeField& blockDiag =
+                blockM.diag().asLinear();
+            
+            typedef typename CoeffField<BlockType>::linearType linearType;
 
-        /* check the two fields */
-        checkFields
-        (
-            blockDiag,
-            diag,
-            "blockDiag.component (s) = diag"
-        );
-        
-        /* set access to f1 and f2 at end of each field */
-        List_ACCESS(linearType, blockDiag, f1P);
-        List_CONST_ACCESS(scalar, diag, f2P);
+            /* check the two fields */
+            checkFields
+            (
+                blockDiag,
+                diag,
+                "blockDiag.component (s) = diag"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockDiag, f1P);
+            List_CONST_ACCESS(scalar, diag, f2P);
 
-        /* loop through fields performing operations */
-        List_FOR_ALL(diag, i)
-            List_ELEM(blockDiag, f1P, i) .component((dir))
-            = List_ELEM(diag, f2P, i);
-        List_END_FOR_ALL
-    }
-    else if (blockM.diag().activeType() == blockCoeffBase::SQUARE)
-    {
-        typename CoeffField<BlockType>::squareTypeField& blockDiag =
-            blockM.diag().asSquare();
+            /* loop through fields performing operations */
+            List_FOR_ALL(diag, i)
+                List_ELEM(blockDiag, f1P, i) .component((dir))
+                = List_ELEM(diag, f2P, i);
+            List_END_FOR_ALL
 
-        typedef typename CoeffField<BlockType>::squareType squareType;
+            break;
+        }
+        case blockCoeffBase::SQUARE:
+        {
+            typename CoeffField<BlockType>::squareTypeField& blockDiag =
+                blockM.diag().asSquare();
 
-        /* check the two fields */
-        checkFields
-        (
-            blockDiag,
-            diag,
-            "blockDiag.component (s) = diag"
-        );
-        
-        /* set access to f1 and f2 at end of each field */
-        List_ACCESS(squareType, blockDiag, f1P);
-        List_CONST_ACCESS(scalar, diag, f2P);
+            typedef typename CoeffField<BlockType>::squareType squareType;
 
-        /* loop through fields performing operations */
-        List_FOR_ALL(diag, i)
-            List_ELEM(blockDiag, f1P, i) ((dir), (dir))
-            = List_ELEM(diag, f2P, i);
-        List_END_FOR_ALL
+            /* check the two fields */
+            checkFields
+            (
+                blockDiag,
+                diag,
+                "blockDiag.component (s) = diag"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockDiag, f1P);
+            List_CONST_ACCESS(scalar, diag, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(diag, i)
+                List_ELEM(blockDiag, f1P, i) ((dir), (dir))
+                = List_ELEM(diag, f2P, i);
+            List_END_FOR_ALL
+        }
+        default:
     }
 
     blockInsert(dir, source, blockB);
