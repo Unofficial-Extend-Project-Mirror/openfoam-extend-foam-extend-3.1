@@ -61,6 +61,16 @@ namespace blockMatrixTools
         Field<BlockType>& blockX
     );
 
+    //- Insert field into block field, given full matrix position
+    template<class BlockType>
+    void blockInsert
+    (
+        const direction dirI,
+        const direction dirJ,
+        const scalarField& x,
+        Field<BlockType>& blockX
+    );
+
     //- Retrieve field from block field
     template<class BlockType>
     void blockRetrieve

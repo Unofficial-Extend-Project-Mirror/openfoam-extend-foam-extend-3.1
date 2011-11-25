@@ -65,6 +65,20 @@ void blockInsert
 
 
 template<class BlockType>
+void blockInsert
+(
+    const direction dirI,
+    const direction dirJ,
+    const scalarField& x,
+    Field<BlockType>& blockX
+)
+{
+    const direction dir(dirI * BlockType::rowLength + dirJ);
+    blockInsert(dir, x, blockX);
+}
+
+
+template<class BlockType>
 void blockRetrieve
 (
     const direction dir,
