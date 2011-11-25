@@ -79,6 +79,48 @@ void blockInsert
 
 
 template<class BlockType>
+void blockIncrement
+(
+    const direction dir,
+    const scalarField& x,
+    Field<BlockType>& blockX
+)
+{
+    /* check the two fields */
+    checkFields
+    (
+        blockX,
+        x,
+        "blockDiag.component (s) += diag"
+    );
+    
+    /* set access to f1 and f2 at end of each field */
+    List_ACCESS(BlockType, blockX, f1P);
+    List_CONST_ACCESS(scalar, x, f2P);
+
+    /* loop through fields performing operations */
+    List_FOR_ALL(x, i)
+        List_ELEM(blockX, f1P, i) .component((dir))
+        += List_ELEM(x, f2P, i);
+    List_END_FOR_ALL
+}
+
+
+template<class BlockType>
+void blockIncrement
+(
+    const direction dirI,
+    const direction dirJ,
+    const scalarField& x,
+    Field<BlockType>& blockX
+)
+{
+    const direction dir(dirI * BlockType::rowLength + dirJ);
+    blockIncrement(dir, x, blockX);
+}
+
+
+template<class BlockType>
 void blockRetrieve
 (
     const direction dir,
@@ -179,6 +221,91 @@ void insertDiagSource
 
 
 template<class BlockType>
+void addDiagSource
+(
+    const direction dir,
+    const fvScalarMatrix& m,
+    BlockLduMatrix<BlockType>& blockM,
+    Field<BlockType>& blockB
+)
+{
+    // Prepare the diagonal and source
+
+    scalarField diag = m.diag();
+    scalarField source = m.source();
+
+    // Add boundary source contribution
+    m.addBoundaryDiag(diag, 0);
+    m.addBoundarySource(source, false);
+
+    switch (blockM.diag().activeType())
+    {
+        case blockCoeffBase::UNALLOCATED:
+        {
+            blockM.diag().asScalar() = diag;
+            break;
+        }
+        case blockCoeffBase::SCALAR:
+        case blockCoeffBase::LINEAR:
+        {
+            typename CoeffField<BlockType>::linearTypeField& blockDiag =
+                blockM.diag().asLinear();
+            
+            typedef typename CoeffField<BlockType>::linearType linearType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockDiag,
+                diag,
+                "blockDiag.component (s) += diag"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockDiag, f1P);
+            List_CONST_ACCESS(scalar, diag, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(diag, i)
+                List_ELEM(blockDiag, f1P, i) .component((dir))
+                += List_ELEM(diag, f2P, i);
+            List_END_FOR_ALL
+
+            break;
+        }
+        case blockCoeffBase::SQUARE:
+        {
+            typename CoeffField<BlockType>::squareTypeField& blockDiag =
+                blockM.diag().asSquare();
+
+            typedef typename CoeffField<BlockType>::squareType squareType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockDiag,
+                diag,
+                "blockDiag.component (s) += diag"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockDiag, f1P);
+            List_CONST_ACCESS(scalar, diag, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(diag, i)
+                List_ELEM(blockDiag, f1P, i) ((dir), (dir))
+                += List_ELEM(diag, f2P, i);
+            List_END_FOR_ALL
+        }
+        default:
+    }
+
+    blockInsert(dir, source, blockB);
+}
+
+
+template<class BlockType>
 void insertUpperLower
 (
     const direction dir,
@@ -269,12 +396,7 @@ void insertUpperLower
             << abort(FatalError);
     }
 
-    if (m.symmetric() && blockM.symmetric())
-    {
-        Info<< "Both m and blockM are symmetric: inserting only upper triangle"
-            << endl;
-    }
-    else
+    if (!m.symmetric() || !blockM.symmetric())
     {
         // Either scalar or block matrix is asymmetric: insert lower triangle
         const scalarField& lower = m.lower();
@@ -342,6 +464,164 @@ void insertUpperLower
 
 
 template<class BlockType>
+void addUpperLower
+(
+    const direction dir,
+    const fvScalarMatrix& m,
+    BlockLduMatrix<BlockType>& blockM
+)
+{
+    if (m.diagonal())
+    {
+        // Matrix for insertion is diagonal-only: nothing to do
+        return;
+    }
+
+    if (m.hasUpper())
+    {
+        const scalarField& upper = m.upper();
+
+        if (blockM.upper().activeType() == blockCoeffBase::UNALLOCATED)
+        {
+            blockM.upper().asScalar() = upper;
+        }
+        else if
+        (
+            blockM.upper().activeType() == blockCoeffBase::SCALAR
+         || blockM.upper().activeType() == blockCoeffBase::LINEAR
+        )
+        {
+            typename CoeffField<BlockType>::linearTypeField& blockUpper =
+                blockM.upper().asLinear();
+
+            typedef typename CoeffField<BlockType>::linearType linearType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockUpper,
+                upper,
+                "blockUpper.component (s) += upper"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockUpper, f1P);
+            List_CONST_ACCESS(scalar, upper, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(upper, i)
+                List_ELEM(blockUpper, f1P, i) .component((dir))
+                += List_ELEM(upper, f2P, i);
+            List_END_FOR_ALL
+        }
+        else if (blockM.upper().activeType() == blockCoeffBase::SQUARE)
+        {
+            typename CoeffField<BlockType>::squareTypeField& blockUpper =
+                blockM.upper().asSquare();
+
+            typedef typename CoeffField<BlockType>::squareType squareType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockUpper,
+                upper,
+                "blockUpper.component (s) += upper"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockUpper, f1P);
+            List_CONST_ACCESS(scalar, upper, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(upper, i)
+                List_ELEM(blockUpper, f1P, i) ((dir), (dir))
+                += List_ELEM(upper, f2P, i);
+            List_END_FOR_ALL
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void insertUpperLower\n"
+            "(\n"
+            "    const direction dir,\n"
+            "    const fvScalarMatrix& m,\n"
+            "    BlockLduMatrix<BlockType>& blockM\n"
+            ")"
+        )   << "Error in matrix insertion: problem with block structure"
+            << abort(FatalError);
+    }
+
+    if (!m.symmetric() || !blockM.symmetric())
+    {
+        // Either scalar or block matrix is asymmetric: insert lower triangle
+        const scalarField& lower = m.lower();
+
+        if (blockM.lower().activeType() == blockCoeffBase::UNALLOCATED)
+        {
+            blockM.lower().asScalar() = lower;
+        }
+        else if
+        (
+            blockM.lower().activeType() == blockCoeffBase::SCALAR
+         || blockM.lower().activeType() == blockCoeffBase::LINEAR
+        )
+        {
+            typename CoeffField<BlockType>::linearTypeField& blockLower =
+                blockM.lower().asLinear();
+
+            typedef typename CoeffField<BlockType>::linearType linearType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockLower,
+                lower,
+                "blockLower.component (s) += lower"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockLower, f1P);
+            List_CONST_ACCESS(scalar, lower, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(lower, i)
+                List_ELEM(blockLower, f1P, i) .component((dir))
+                += List_ELEM(lower, f2P, i);
+            List_END_FOR_ALL
+        }
+        else if (blockM.lower().activeType() == blockCoeffBase::SQUARE)
+        {
+            typename CoeffField<BlockType>::squareTypeField& blockLower =
+                blockM.lower().asSquare();
+
+            typedef typename CoeffField<BlockType>::squareType squareType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockLower,
+                lower,
+                "blockLower.component (s) += lower"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockLower, f1P);
+            List_CONST_ACCESS(scalar, lower, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(lower, i)
+                List_ELEM(blockLower, f1P, i) ((dir), (dir))
+                += List_ELEM(lower, f2P, i);
+            List_END_FOR_ALL
+        }
+    }
+}
+
+
+template<class BlockType>
 void insertEquation
 (
     const direction dir,
@@ -354,6 +634,22 @@ void insertEquation
     insertDiagSource(dir, m, blockM, blockB);
     insertUpperLower(dir, m, blockM);
     blockInsert(dir, m.psi(), blockX);
+}
+
+
+template<class BlockType>
+void addEquation
+(
+    const direction dir,
+    const fvScalarMatrix& m,
+    BlockLduMatrix<BlockType>& blockM,
+    Field<BlockType>& blockX,
+    Field<BlockType>& blockB
+)
+{
+    addDiagSource(dir, m, blockM, blockB);
+    addUpperLower(dir, m, blockM);
+    blockIncrement(dir, m.psi(), blockX);
 }
 
 

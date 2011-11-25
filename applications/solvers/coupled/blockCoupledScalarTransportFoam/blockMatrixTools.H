@@ -71,6 +71,25 @@ namespace blockMatrixTools
         Field<BlockType>& blockX
     );
 
+    //- Add field into block field
+    template<class BlockType>
+    void blockIncrement
+    (
+        const direction dir,
+        const scalarField& x,
+        Field<BlockType>& blockX
+    );
+
+    //- Add field into block field, given full matrix position
+    template<class BlockType>
+    void blockIncrement
+    (
+        const direction dirI,
+        const direction dirJ,
+        const scalarField& x,
+        Field<BlockType>& blockX
+    );
+
     //- Retrieve field from block field
     template<class BlockType>
     void blockRetrieve
@@ -90,6 +109,16 @@ namespace blockMatrixTools
         Field<BlockType>& blockB
     );
 
+    //- Add matrix diagonal and source into the block system
+    template<class BlockType>
+    void addDiagSource
+    (
+        const direction dir,
+        const fvScalarMatrix& m,
+        BlockLduMatrix<BlockType>& blockM,
+        Field<BlockType>& blockB
+    );
+
     // Insert matrix into the block system
     template<class Type, class BlockType>
     void insertUpperLower
@@ -99,9 +128,29 @@ namespace blockMatrixTools
         BlockLduMatrix<BlockType>& blockM
     );
 
+    // Add matrix into the block system
+    template<class Type, class BlockType>
+    void addUpperLower
+    (
+        const direction dir,
+        const fvScalarMatrix& m,
+        BlockLduMatrix<BlockType>& blockM
+    );
+
     // Insert matrix into the block system
     template<class BlockType>
     void insertEquation
+    (
+        const direction dir,
+        const fvScalarMatrix& m,
+        BlockLduMatrix<BlockType>& blockM,
+        Field<BlockType>& blockX,
+        Field<BlockType>& blockB
+    );
+
+    // Add matrix into the block system
+    template<class BlockType>
+    void addEquation
     (
         const direction dir,
         const fvScalarMatrix& m,
