@@ -44,10 +44,23 @@ void blockInsert
     Field<BlockType>& blockX
 )
 {
-    forAll (x, i)
-    {
-        blockX[i](dir) = x[i];
-    }
+    /* check the two fields */
+    checkFields
+    (
+        blockX,
+        x,
+        "blockDiag.component (s) = diag"
+    );
+    
+    /* set access to f1 and f2 at end of each field */
+    List_ACCESS(BlockType, blockX, f1P);
+    List_CONST_ACCESS(scalar, x, f2P);
+
+    /* loop through fields performing operations */
+    List_FOR_ALL(x, i)
+        List_ELEM(blockX, f1P, i) .component((dir))
+        = List_ELEM(x, f2P, i);
+    List_END_FOR_ALL
 }
 
 
@@ -59,10 +72,10 @@ void blockRetrieve
     const Field<BlockType>& blockX
 )
 {
-    forAll (x, i)
-    {
-        x[i] = blockX[i](dir);
-    }
+    TFOR_ALL_F_OP_F_FUNC_S
+    (
+        scalar, x, =, BlockType, blockX, .component, const direction, dir
+    )
 }
 
 
@@ -96,21 +109,51 @@ void insertDiagSource
     {
         typename CoeffField<BlockType>::linearTypeField& blockDiag =
             blockM.diag().asLinear();
+        
+        typedef typename CoeffField<BlockType>::linearType linearType;
 
-        forAll (diag, i)
-        {
-            blockDiag[i](dir) = diag[i];
-        }
+        /* check the two fields */
+        checkFields
+        (
+            blockDiag,
+            diag,
+            "blockDiag.component (s) = diag"
+        );
+        
+        /* set access to f1 and f2 at end of each field */
+        List_ACCESS(linearType, blockDiag, f1P);
+        List_CONST_ACCESS(scalar, diag, f2P);
+
+        /* loop through fields performing operations */
+        List_FOR_ALL(diag, i)
+            List_ELEM(blockDiag, f1P, i) .component((dir))
+            = List_ELEM(diag, f2P, i);
+        List_END_FOR_ALL
     }
     else if (blockM.diag().activeType() == blockCoeffBase::SQUARE)
     {
         typename CoeffField<BlockType>::squareTypeField& blockDiag =
             blockM.diag().asSquare();
 
-        forAll (diag, i)
-        {
-            blockDiag[i](dir, dir) = diag[i];
-        }
+        typedef typename CoeffField<BlockType>::squareType squareType;
+
+        /* check the two fields */
+        checkFields
+        (
+            blockDiag,
+            diag,
+            "blockDiag.component (s) = diag"
+        );
+        
+        /* set access to f1 and f2 at end of each field */
+        List_ACCESS(squareType, blockDiag, f1P);
+        List_CONST_ACCESS(scalar, diag, f2P);
+
+        /* loop through fields performing operations */
+        List_FOR_ALL(diag, i)
+            List_ELEM(blockDiag, f1P, i) ((dir), (dir))
+            = List_ELEM(diag, f2P, i);
+        List_END_FOR_ALL
     }
 
     blockInsert(dir, source, blockB);
@@ -148,20 +191,50 @@ void insertUpperLower
             typename CoeffField<BlockType>::linearTypeField& blockUpper =
                 blockM.upper().asLinear();
 
-            forAll (upper, i)
-            {
-                blockUpper[i](dir) = upper[i];
-            }
+            typedef typename CoeffField<BlockType>::linearType linearType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockUpper,
+                upper,
+                "blockUpper.component (s) = upper"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockUpper, f1P);
+            List_CONST_ACCESS(scalar, upper, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(upper, i)
+                List_ELEM(blockUpper, f1P, i) .component((dir))
+                = List_ELEM(upper, f2P, i);
+            List_END_FOR_ALL
         }
         else if (blockM.upper().activeType() == blockCoeffBase::SQUARE)
         {
             typename CoeffField<BlockType>::squareTypeField& blockUpper =
                 blockM.upper().asSquare();
 
-            forAll (upper, i)
-            {
-                blockUpper[i](dir, dir) = upper[i];
-            }
+            typedef typename CoeffField<BlockType>::squareType squareType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockUpper,
+                upper,
+                "blockUpper.component (s) = upper"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockUpper, f1P);
+            List_CONST_ACCESS(scalar, upper, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(upper, i)
+                List_ELEM(blockUpper, f1P, i) ((dir), (dir))
+                = List_ELEM(upper, f2P, i);
+            List_END_FOR_ALL
         }
     }
     else
@@ -201,20 +274,50 @@ void insertUpperLower
             typename CoeffField<BlockType>::linearTypeField& blockLower =
                 blockM.lower().asLinear();
 
-            forAll (lower, i)
-            {
-                blockLower[i](dir) = lower[i];
-            }
+            typedef typename CoeffField<BlockType>::linearType linearType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockLower,
+                lower,
+                "blockLower.component (s) = lower"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(linearType, blockLower, f1P);
+            List_CONST_ACCESS(scalar, lower, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(lower, i)
+                List_ELEM(blockLower, f1P, i) .component((dir))
+                = List_ELEM(lower, f2P, i);
+            List_END_FOR_ALL
         }
         else if (blockM.lower().activeType() == blockCoeffBase::SQUARE)
         {
             typename CoeffField<BlockType>::squareTypeField& blockLower =
                 blockM.lower().asSquare();
 
-            forAll (lower, i)
-            {
-                blockLower[i](dir, dir) = lower[i];
-            }
+            typedef typename CoeffField<BlockType>::squareType squareType;
+
+            /* check the two fields */
+            checkFields
+            (
+                blockLower,
+                lower,
+                "blockLower.component (s) = lower"
+            );
+            
+            /* set access to f1 and f2 at end of each field */
+            List_ACCESS(squareType, blockLower, f1P);
+            List_CONST_ACCESS(scalar, lower, f2P);
+
+            /* loop through fields performing operations */
+            List_FOR_ALL(lower, i)
+                List_ELEM(blockLower, f1P, i) ((dir), (dir))
+                = List_ELEM(lower, f2P, i);
+            List_END_FOR_ALL
         }
     }
 }
