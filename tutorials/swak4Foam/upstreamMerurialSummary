@@ -1,5 +1,5 @@
-parent: 779:2daaf689c376 tip
- Merge in release
+parent: 780:317bebdcdcd0 tip
+ Move version-recognition down to Libraries-Allwmake to allow compilation in distros
 branch: finiteArea
 commit: 546 unknown (clean)
 update: (current)

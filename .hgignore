@@ -97,3 +97,4 @@ ThirdParty/rpmBuild/rpmDB/*
 
 #swak4Foam stuff
 src/swak4Foam/*/*.output
+src/swak4Foam/swak4FoamParsers/foamVersion4swak.H
