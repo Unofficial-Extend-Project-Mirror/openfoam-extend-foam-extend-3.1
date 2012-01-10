@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: manipulateFaField.H,v 5a312d50a849 2011-04-09 23:55:13Z bgschaid $ 
+//  OF-extend Revision: $Id: manipulateFaField.H,v b400570d9219 2011-12-09 00:06:13Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -80,10 +80,16 @@ protected:
 
     const dictionary &dict_;
 
-    template<class T>
+    template<class T,class TMask>
     void manipulate(
         const T &data,
-        const areaScalarField &mask
+        const TMask &mask
+    );
+
+    template<class T,class TMask>
+    void manipulateEdge(
+        const T &data,
+        const TMask &mask
     );
 
     autoPtr<FaFieldValueExpressionDriver> driver_;

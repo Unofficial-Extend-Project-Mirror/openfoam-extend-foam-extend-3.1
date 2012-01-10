@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: groovyBCCommon.C,v b434ec03bd35 2011-09-23 15:01:21Z bgschaid $ 
+ ICE Revision: $Id: groovyBCCommon.C,v d36ab5f6c331 2011-11-13 20:23:44Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "groovyBCCommon.H"
@@ -65,6 +65,7 @@ groovyBCCommon<Type>::groovyBCCommon
     bool isPoint
 )
 :
+    evaluateDuringConstruction_(false),  
     debug_(false),
     hasGradient_(hasGradient),
     fractionExpression_(isPoint ? "toPoint" : "1")
@@ -82,6 +83,7 @@ groovyBCCommon<Type>::groovyBCCommon
     const groovyBCCommon<Type>& ptf
 )
 :
+    evaluateDuringConstruction_(ptf.evaluateDuringConstruction_),  
     debug_(ptf.debug_),
     hasGradient_(ptf.hasGradient_),
     valueExpression_(ptf.valueExpression_),
@@ -99,6 +101,9 @@ groovyBCCommon<Type>::groovyBCCommon
     bool isPoint
 )
 :
+    evaluateDuringConstruction_(
+        dict.lookupOrDefault<bool>("evaluateDuringConstruction",false)
+    ),  
     debug_(dict.lookupOrDefault<bool>("debug",false)),
     hasGradient_(hasGradient),
     fractionExpression_(dict.lookupOrDefault(
@@ -135,6 +140,8 @@ void groovyBCCommon<Type>::write(Ostream& os) const
         os.writeKeyword("fractionExpression")
             << fractionExpression_ << token::END_STATEMENT << nl;
     }
+    os.writeKeyword("evaluateDuringConstruction")
+        << evaluateDuringConstruction_ << token::END_STATEMENT << nl;
 
     // debug_ not written on purpose
 }

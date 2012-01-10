@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchIntegrateFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: patchIntegrateFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -68,7 +68,8 @@ Field<T> patchIntegrateFunctionObject::integrate(const word& fieldName,T unsetVa
     }
 
     if(verbose()) {
-        Info << " Integrals of " << fieldName << " :";
+        Info<< regionString() 
+            << " Integrals of " << fieldName << " :";
 
         forAll(patchNames_, patchI)
         {

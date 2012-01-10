@@ -28,11 +28,13 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: CommonValueExpressionDriver.C,v 21d59f2f8593 2011-09-28 09:31:08Z bgschaid $ 
+ ICE Revision: $Id: CommonValueExpressionDriver.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "CommonValueExpressionDriver.H"
 #include "GlobalVariablesRepository.H"
+
+#include "ExpressionDriverWriter.H"
 
 #include "Random.H"
 
@@ -132,7 +134,18 @@ void CommonValueExpressionDriver::readVariablesAndTables(const dictionary &dict)
     }
 
     if(dict.found("storedVariables")) {
-        storedVariables_=List<StoredExpressionResult>(dict.lookup("storedVariables"));
+        if(
+            writer_.valid()
+            &&
+            storedVariables_.size()>0
+        ) {
+            WarningIn("CommonValueExpressionDriver::readVariablesAndTables")
+                << "Seems like 'storedVariables' was already read. No update from "
+                    << dict.lookup("storedVariables")
+                    << endl;
+        } else {
+            storedVariables_=List<StoredExpressionResult>(dict.lookup("storedVariables"));
+        }
     }
 
     setVariableStrings(dict);
@@ -273,7 +286,7 @@ stringList CommonValueExpressionDriver::readVariableStrings(const dictionary &di
     FatalErrorIn("CommonValueExpressionDriver::readVariableStrings(const dictionary &dict)")
         << " Entry 'variables' must either be a string or a list of strings"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     
     return stringList();
 }
@@ -679,7 +692,7 @@ void CommonValueExpressionDriver::addVariables(const string &exprList,bool clear
                 << "No terminating ';' found in expression '"
                     << exprList.substr(start) << "'\n"
                     << endl
-                    << abort(FatalError);            
+                    << exit(FatalError);            
         }
         std::string::size_type  eqPos=exprList.find('=',start);
         if(eqPos==std::string::npos || eqPos > end) {
@@ -687,7 +700,7 @@ void CommonValueExpressionDriver::addVariables(const string &exprList,bool clear
                 << "No '=' found in expression '"
                     << exprList.substr(start,end-start) << "'\n"
                     << endl
-                    << abort(FatalError);            
+                    << exit(FatalError);            
         }
         string expr(exprList.substr(eqPos+1,end-eqPos-1));
 
@@ -699,7 +712,7 @@ void CommonValueExpressionDriver::addVariables(const string &exprList,bool clear
                     << "No closing '}' found in " 
                         << exprList.substr(start,eqPos-start)
                         << endl
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
             word name(exprList.substr(start,startPos-start));
             string remoteExpr(exprList.substr(startPos+1,endPos-startPos-1));
@@ -740,7 +753,8 @@ void CommonValueExpressionDriver::writeTables(Ostream &os,const HashTable<interp
 const fvMesh &CommonValueExpressionDriver::regionMesh
 (
     const dictionary &dict,
-    const fvMesh &mesh
+    const fvMesh &mesh,
+    bool readIfNecessary
 )
 {
     if(!dict.found("region")) {
@@ -755,6 +769,33 @@ const fvMesh &CommonValueExpressionDriver::regionMesh
         Pout << "Using mesh " << dict.lookup("region")  << endl;
     }
     
+    if(
+        !mesh.time().foundObject<objectRegistry>(
+            dict.lookup("region")
+        )
+        &&
+        readIfNecessary
+    ) {
+        WarningIn("CommonValueExpressionDriver::regionMesh")
+            << "Region " << dict.lookup("region")
+                << " not in memory. Trying to register it"
+                << endl;
+
+        autoPtr<polyMesh> temporary(
+            new fvMesh
+            (
+                IOobject(
+                    word(dict.lookup("region")),
+                    mesh.time().constant(),
+                    mesh.time(),
+                    IOobject::MUST_READ
+                )
+            )
+        );
+        //        Info << "Hepp: "<< temporary->polyMesh::ownedByRegistry() << endl;
+        temporary->polyMesh::store(temporary.ptr());
+    }
+
     //     return dynamicCast<const fvMesh&>( // soesn't work with gcc 3.2
     return dynamic_cast<const fvMesh&>(
         mesh.time().lookupObject<objectRegistry>(
@@ -885,6 +926,61 @@ const ExpressionResult &CommonValueExpressionDriver::lookupGlobal(
 void CommonValueExpressionDriver::setGlobalScopes(const wordList &other)
 {
     globalVariableScopes_=other;
+}
+
+void CommonValueExpressionDriver::createWriterAndRead(const word &name)
+{
+    if(
+        hasDataToWrite()
+        &&
+        !writer_.valid()
+    ) {
+        writer_.set(
+            new ExpressionDriverWriter(
+                name+"_"+this->type(),
+                *this
+            )
+        );
+    }
+}
+
+void CommonValueExpressionDriver::tryWrite() const
+{
+    if(
+        writer_.valid()
+        &&
+        mesh().time().outputTime()
+    ) {
+        writer_->write();
+    }
+}
+
+bool CommonValueExpressionDriver::hasDataToWrite() const
+{
+    if(storedVariables_.size()>0) {
+        return true;
+    }
+
+    return false;
+}
+
+void CommonValueExpressionDriver::getData(const dictionary &dict)
+{
+    if(dict.found("storedVariables")) {
+        storedVariables_=List<StoredExpressionResult>(dict.lookup("storedVariables"));
+    }
+}
+
+void CommonValueExpressionDriver::prepareData(dictionary &dict) const
+{
+    if(storedVariables_.size()>0) {
+        const_cast<CommonValueExpressionDriver&>(*this).updateStoredVariables(true);
+        
+        dict.add(
+            "storedVariables",
+            storedVariables_
+        );
+    }
 }
 
 // ************************************************************************* //

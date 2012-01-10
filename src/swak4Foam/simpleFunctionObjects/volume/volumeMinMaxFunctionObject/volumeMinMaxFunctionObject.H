@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeMinMaxFunctionObject.H,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeMinMaxFunctionObject.H,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -69,7 +69,7 @@ protected:
 
     word dirName();
 
-    string firstLine();
+    stringList columnNames();
     
     virtual scalarField process(const word& fieldName,scalar preset);
     virtual Field<vector> process(const word& fieldName,vector preset);

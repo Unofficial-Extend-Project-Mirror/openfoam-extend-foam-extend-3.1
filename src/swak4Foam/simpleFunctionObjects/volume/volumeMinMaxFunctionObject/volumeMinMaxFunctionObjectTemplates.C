@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeMinMaxFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeMinMaxFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -63,7 +63,8 @@ Field<T> volumeMinMaxFunctionObject::minMax(const word& fieldName,T unsetVal) co
         ).value();
 
     if(verbose()) {
-        Info << " Range of " << fieldName << " [ "
+        Info<< regionString() 
+            << " Range of " << fieldName << " [ "
             << vals[0] << " , " << vals[1] << " ] "
             << fld.dimensions() << endl;
     }

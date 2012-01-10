@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: FaceZoneValueExpressionDriver.C,v d336629aa26b 2010-12-14 19:43:35Z bgschaid $ 
+ ICE Revision: $Id: FaceZoneValueExpressionDriver.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "FaceZoneValueExpressionDriver.H"
@@ -58,7 +58,7 @@ label getFaceZoneID(const fvMesh &mesh,const word &name)
             << "The faceZone " << name << " was not found in "
                 << mesh.faceZones().names()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
 
     }
     return result;
@@ -85,9 +85,17 @@ FaceZoneValueExpressionDriver::FaceZoneValueExpressionDriver(const dictionary& d
  :
     SubsetValueExpressionDriver(dict),
     faceZone_(
-        regionMesh(dict,mesh).faceZones()[
+        regionMesh(
+            dict,
+            mesh,
+            searchOnDisc()
+        ).faceZones()[
             getFaceZoneID(
-                regionMesh(dict,mesh),
+                regionMesh(
+                    dict,
+                    mesh,
+                    searchOnDisc()
+                ),
                 dict.lookup(
                     "zoneName"
                 )
@@ -159,7 +167,7 @@ scalarField *FaceZoneValueExpressionDriver::makeCellVolumeField()
     FatalErrorIn("FaceZoneValueExpressionDriver::makeCellVolumeField()")
         << "faceZone knows nothing about cells"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new scalarField(0);
 }
 

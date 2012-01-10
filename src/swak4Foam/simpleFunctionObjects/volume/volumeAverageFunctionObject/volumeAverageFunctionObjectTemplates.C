@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeAverageFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeAverageFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -60,7 +60,8 @@ Field<T> volumeAverageFunctionObject::average(const word& fieldName,T unsetVal) 
     ).value();
 
     if(verbose()) {
-        Info << " Average of " << fieldName << " = "
+        Info<< regionString() 
+            << " Average of " << fieldName << " = "
             << vals[0] << "  " << fld.dimensions() << endl;
     }
 

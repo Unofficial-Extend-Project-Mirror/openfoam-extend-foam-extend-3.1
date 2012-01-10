@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SurfacesRepository.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: SurfacesRepository.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "SurfacesRepository.H"
@@ -89,7 +89,7 @@ sampledSurface &SurfacesRepository::getSurface(
             << "Found a mesh named " << name << " which is not for the mesh "
                 << mesh.name() << "but for the mesh " << found.mesh().name()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
 
     return found;

@@ -1,6 +1,6 @@
-parent: 587:87e61f56d704 
- Added tag release2011-10-03 for changeset d04acc89b2df
-branch: default
-commit: 1101 unknown (clean)
+parent: 779:2daaf689c376 tip
+ Merge in release
+branch: finiteArea
+commit: 546 unknown (clean)
 update: (current)
 mq:     (empty queue)

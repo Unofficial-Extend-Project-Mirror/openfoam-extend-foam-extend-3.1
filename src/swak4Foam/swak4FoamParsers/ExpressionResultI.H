@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: ExpressionResultI.H,v d23afdc7d21f 2011-09-08 09:00:53Z bgschaid $ 
+ ICE Revision: $Id: ExpressionResultI.H,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 namespace Foam {
@@ -125,7 +125,7 @@ namespace Foam {
                 << "The expected return type " << pTraits<Type>::typeName 
                     << " is different from the stored result type "
                     << valType_ << "\n" << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
         }
 
         tmp<Field<Type> > result;
@@ -162,6 +162,28 @@ namespace Foam {
             }
         }
         result.setResult(avg,size);
+        return result;
+    }
+
+    template<template<class> class BinOp,class Type>
+    inline Type ExpressionResult::getReduced(BinOp<Type> op,Type initial)
+    {
+        if(valType_!=pTraits<Type>::typeName) {
+            FatalErrorIn("ExpressionResult::getReduced(BinOp<Type> op,Type initial)")
+                << "The expected return type " << pTraits<Type>::typeName 
+                    << " is different from the stored result type "
+                    << valType_ << "\n" << endl
+                    << exit(FatalError);
+        }
+
+        Type result=initial;
+        const Field<Type> &vals=*static_cast<Field<Type>*>(valPtr_);
+        forAll(vals,i) {
+            result=op(result,vals[i]);
+        }
+
+        reduce(result,op);
+
         return result;
     }
 

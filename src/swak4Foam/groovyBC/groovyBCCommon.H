@@ -37,7 +37,7 @@ Description
 SourceFiles
     groovyBCCommon.C
 
- ICE Revision: $Id: groovyBCCommon.H,v 04da3db3fb3b 2011-02-04 17:23:00Z bgschaid $ 
+ ICE Revision: $Id: groovyBCCommon.H,v d36ab5f6c331 2011-11-13 20:23:44Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #ifndef groovyBCCommon_H
@@ -58,6 +58,8 @@ template<class Type>
 class groovyBCCommon
 {
 
+    bool evaluateDuringConstruction_;
+
 protected:
 
     // Protected data
@@ -71,6 +73,10 @@ protected:
     string fractionExpression_;
 
     string nullValue();
+
+    bool evaluateDuringConstruction() const 
+        { return evaluateDuringConstruction_; }
+
 public:
 
     // Constructors

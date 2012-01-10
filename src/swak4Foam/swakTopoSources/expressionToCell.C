@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: expressionToCell.C,v bf831db01a43 2010-09-07 21:41:01Z bgschaid $ 
+ ICE Revision: $Id: expressionToCell.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "expressionToCell.H"
@@ -75,13 +75,13 @@ void Foam::expressionToCell::combine(topoSet& set, const bool add) const
             true  // search on disc
         );
     driver.parse(expression_);
-    if(!driver.resultIsLogical()) {
+    if(!driver.resultIsTyp<volScalarField>(true)) {
         FatalErrorIn("Foam::expressionToCell::combine(topoSet& set, const bool add) const")
             << "Expression " << expression_ << " does not evaluate to a logical expression"
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
-    const volScalarField &condition=driver.getScalar();
+    const volScalarField &condition=driver.getResult<volScalarField>();
 
     forAll(condition, cellI)
     {

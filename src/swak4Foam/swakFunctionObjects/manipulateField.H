@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: manipulateField.H,v ba70edae8ed2 2011-04-09 22:50:11Z bgschaid $ 
+//  OF-extend Revision: $Id: manipulateField.H,v b782cab0841b 2011-10-12 21:59:30Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -81,10 +81,16 @@ protected:
 
     dictionary dict_;
 
-    template<class T>
+    template<class TData,class TMask>
     void manipulate(
-        const T &data,
-        const volScalarField &mask
+        const TData &data,
+        const TMask &mask
+    );
+
+    template<class TData,class TMask>
+    void manipulateSurface(
+        const TData &data,
+        const TMask &mask
     );
 
     autoPtr<FieldValueExpressionDriver> driver_;

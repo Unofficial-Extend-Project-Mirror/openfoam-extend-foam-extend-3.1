@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeAverageFunctionObject.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeAverageFunctionObject.C,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -90,9 +90,9 @@ Field<tensor> volumeAverageFunctionObject::process(const word& fieldName,tensor 
     return average(fieldName,preset);
 }
 
-string volumeAverageFunctionObject::firstLine()
+stringList volumeAverageFunctionObject::columnNames()
 {
-    return " average";
+    return stringList(1,"average");
 }
 
 } // namespace Foam

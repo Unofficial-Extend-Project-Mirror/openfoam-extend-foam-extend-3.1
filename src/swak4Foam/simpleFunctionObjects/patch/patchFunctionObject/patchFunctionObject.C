@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchFunctionObject.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: patchFunctionObject.C,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -87,15 +87,13 @@ bool patchFunctionObject::start()
     return true;
 }
 
-string patchFunctionObject::firstLine()
+stringList patchFunctionObject::columnNames()
 {
-    OStringStream o;
-
-    forAll(patchNames_,patchI) {
-        o << token::SPACE << patchNames_[patchI];
+    stringList result(patchNames_.size());
+    forAll(result,i) {
+        result[i]=patchNames_[i];
     }
-
-    return o.str();
+    return result;
 }
 
 } // namespace Foam

@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: pythonFluIntegrationFunctionObject.C,v 0af659ec0256 2011-08-30 09:43:15Z bgschaid $ 
+//  OF-extend Revision: $Id: pythonFluIntegrationFunctionObject.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -65,7 +65,7 @@ pythonFluIntegrationFunctionObject::pythonFluIntegrationFunctionObject
         FatalErrorIn("pythonFluIntegrationFunctionObject::pythonFluIntegrationFunctionObject")
             << "Python can not import module Foam. Probably no pythonFlu installed"
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
     executeCode("import Foam.OpenFOAM as OpenFOAM",false,true);
     executeCode("import Foam.finiteVolume as finiteVolume",false,true);

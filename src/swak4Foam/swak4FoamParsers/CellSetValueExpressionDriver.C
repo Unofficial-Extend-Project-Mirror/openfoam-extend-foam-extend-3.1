@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: CellSetValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: CellSetValueExpressionDriver.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "CellSetValueExpressionDriver.H"
@@ -98,7 +98,11 @@ CellSetValueExpressionDriver::CellSetValueExpressionDriver(const dictionary& dic
     SetSubsetValueExpressionDriver(dict,dict.lookup("setName"),NEW),
     cellSet_(
         getSet<cellSet>(
-            regionMesh(dict,mesh),
+            regionMesh(
+                dict,
+                mesh,
+                searchOnDisc()
+            ),
             dict.lookup("setName"),
             origin_
         )
@@ -165,7 +169,7 @@ scalarField *CellSetValueExpressionDriver::makeFaceAreaMagField()
     FatalErrorIn("CellSetValueExpressionDriver::makeFaceAreaField()")
         << "cellSet knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new scalarField(0);
 }
 
@@ -174,7 +178,7 @@ scalarField *CellSetValueExpressionDriver::makeFaceFlipField()
     FatalErrorIn("CellSetValueExpressionDriver::makeFaceFlipField()")
         << "cellSet knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new scalarField(0);
 }
 
@@ -183,7 +187,7 @@ vectorField *CellSetValueExpressionDriver::makeFaceNormalField()
     FatalErrorIn("CellSetValueExpressionDriver::makeFaceNormalField()")
         << "cellSet knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new vectorField(0);
 }
 
@@ -192,7 +196,7 @@ vectorField *CellSetValueExpressionDriver::makeFaceAreaField()
     FatalErrorIn("CellSetValueExpressionDriver::makeFaceAreaField()")
         << "cellSet knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new vectorField(0);
 }
 

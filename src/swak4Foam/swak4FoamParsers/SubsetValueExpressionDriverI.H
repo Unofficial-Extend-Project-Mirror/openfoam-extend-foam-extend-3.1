@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SubsetValueExpressionDriverI.H,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: SubsetValueExpressionDriverI.H,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -207,7 +207,7 @@ namespace Foam {
                     << " nor " << IFieldType::typeName << ")"
                     << " Autointerpolate: " << this->autoInterpolate_
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
         }
 
         return result;

@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: FaPatchValueExpressionDriverI.H,v b9e71bbaa2be 2011-08-03 17:35:40Z bgschaid $ 
+ ICE Revision: $Id: FaPatchValueExpressionDriverI.H,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -123,7 +123,7 @@ namespace Foam {
                 << "No field of type " << pTraits<scalar>::typeName
                     << " with the name " << name << " found\n"
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
 
             return NULL;
         }
@@ -158,7 +158,7 @@ namespace Foam {
                 << "No field of type " << pTraits<scalar>::typeName
                     << " with the name " << name << " found or unsupported type for patchInternalField\n"
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
 
             return NULL;
         }
@@ -185,7 +185,7 @@ namespace Foam {
                 << "No field of type " << pTraits<scalar>::typeName
                     << " with the name " << name << " found or unsupported type for patchNeighbourField\n"
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
 
             return NULL;
         }
@@ -208,7 +208,7 @@ namespace Foam {
                 << "No field of type " << pTraits<scalar>::typeName
                     << " with the name " << name << " found or unsupported type for lnGrad\n"
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
 
             return NULL;
         }

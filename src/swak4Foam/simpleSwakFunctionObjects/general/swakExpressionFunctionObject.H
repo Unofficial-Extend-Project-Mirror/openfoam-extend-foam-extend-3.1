@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: swakExpressionFunctionObject.H,v 7aac0fa2709a 2011-11-01 21:55:45Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -79,12 +79,12 @@ protected:
 
     word dirName();
 
-    string firstLine();
+    stringList columnNames();
 
     wordList fileNames();
 
     template<class T>
-    void writeData(CommonValueExpressionDriver &driver);
+    void writeTheData(CommonValueExpressionDriver &driver);
 public:
 
     //- Runtime type information

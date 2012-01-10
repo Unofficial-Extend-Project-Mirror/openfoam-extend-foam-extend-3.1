@@ -54,14 +54,22 @@ maxDeltaT       1;
 
 functions 
 (
-    defineThreshold {
+    defineFillDam {
         type addGlobalVariable;
         outputControl timeStep;
         outputInterval 1;
-        globalName aThres;
+
         globalScope fillDam;
-        valueType scalar;
-        value 0.5;
+        globalVariables {
+            aThres {
+                valueType scalar;
+                value 0.5;
+            }
+            gridThick {
+                valueType scalar;
+                value 0.0146;
+            }
+        }
     };
     defineInletHeight {
         type addGlobalVariable;
@@ -71,15 +79,6 @@ functions
         globalScope fillDamBC;
         valueType scalar;
         value 0.1;
-    };
-    defineGridThickness {
-        type addGlobalVariable;
-        outputControl timeStep;
-        outputInterval 1;
-        globalName gridThick;
-        globalScope fillDam;
-        valueType scalar;
-        value 0.0146;
     };
 
     createFillingLine {
@@ -192,6 +191,72 @@ functions
             sum
         );
     }
+    getG {
+        type executeIfObjectExists;
+        readDuringConstruction true;
+
+        objectName g;
+        checkType true;
+        objectType uniformDimensionedVectorField;
+        objectShouldExist false;
+
+        functions {
+            loadG {
+                type readGravitation;
+            }
+        }
+    }
+    /* Commented out because this needs much space
+    massFlow
+    {
+        // Currently not working because the proxy doesn't work
+        type dumpSwakExpression;
+        valueType set;
+        setName  fillingHeight3;
+        set {
+            type swakRegistryProxy;
+            axis y;
+            setName fillingLine;
+        }
+        expression "alpha1*U";
+        //        IKnowThatThisFunctionObjectMayWriteExcessiveAmountsOfData true;
+    }
+    alphaDump
+    {
+        // Currently not working because the proxy doesn't work
+        type dumpSwakExpression;
+        valueType set;
+        setName  fillingHeight4;
+        set {
+            type swakRegistryProxy;
+            axis y;
+            setName fillingLine;
+        }
+        expression "alpha1";
+        //        IKnowThatThisFunctionObjectMayWriteExcessiveAmountsOfData true;
+    }
+    posDump
+    {
+        // Currently not working because the proxy doesn't work
+        type dumpSwakExpression;
+        valueType set;
+        setName  fillingHeight4;
+        set {
+            type swakRegistryProxy;
+            axis y;
+            setName fillingLine;
+        }
+        expression "pos()";
+        //        IKnowThatThisFunctionObjectMayWriteExcessiveAmountsOfData true;
+    }
+    rightDump 
+    {
+        type  dumpSwakExpression;
+        valueType patch;
+        patchName rightWall;
+        expression "alpha1";
+    }
+        */
 );
 
 libs (

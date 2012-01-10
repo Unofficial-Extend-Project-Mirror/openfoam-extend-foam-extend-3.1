@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: GlobalVariablesRepository.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: GlobalVariablesRepository.C,v 7391ceee8fdc 2011-10-15 23:29:18Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "GlobalVariablesRepository.H"
@@ -111,10 +111,17 @@ const ExpressionResult &GlobalVariablesRepository::get(
 }
 
 void GlobalVariablesRepository::addValue(
-    const dictionary &dict
+    const dictionary &dict,
+    const word scopeIn
 ) {
     word name(dict.lookup("globalName"));
-    word scope(dict.lookup("globalScope"));
+    word scope;
+
+    if(scopeIn!="") {
+        scope=scopeIn;
+    } else {
+        scope=word(dict.lookup("globalScope"));
+    }
 
     addValue(
         name,

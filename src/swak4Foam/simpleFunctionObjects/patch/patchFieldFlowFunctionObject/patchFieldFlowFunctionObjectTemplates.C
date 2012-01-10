@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchFieldFlowFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: patchFieldFlowFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -71,7 +71,8 @@ Field<T> patchFieldFlowFunctionObject::fieldFlow(const word& fieldName,T unsetVa
     }
 
     if(verbose()) {
-        Info << " Flows of " << fieldName << " :";
+        Info<< regionString() 
+            << " Flows of " << fieldName << " :";
 
         forAll(patchNames_, patchI)
         {

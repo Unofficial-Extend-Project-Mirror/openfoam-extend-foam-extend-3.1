@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SampledSetValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: SampledSetValueExpressionDriver.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "SampledSetValueExpressionDriver.H"
@@ -195,7 +195,7 @@ scalarField *SampledSetValueExpressionDriver::makeCellVolumeField()
     FatalErrorIn("SampledSetValueExpressionDriver::makeCellVolumeField()")
         << "faceZone knows nothing about cells"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new scalarField(0);
 }
 
@@ -210,7 +210,7 @@ scalarField *SampledSetValueExpressionDriver::makeFaceAreaMagField()
     FatalErrorIn("SampledSetValueExpressionDriver::makeFaceAreaMagField()")
         << "sampledSets knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
 
     return new scalarField(0);
 }
@@ -235,7 +235,7 @@ vectorField *SampledSetValueExpressionDriver::makeFaceAreaField()
     FatalErrorIn("SampledSetValueExpressionDriver::makeFaceAreaField()")
         << "sampledSets knows nothing about faces"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
 
     return new vectorField(0);
 }

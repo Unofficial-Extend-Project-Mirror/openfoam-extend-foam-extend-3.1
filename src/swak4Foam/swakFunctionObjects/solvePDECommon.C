@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: solvePDECommon.C,v be351b011553 2011-09-28 21:45:24Z bgschaid $ 
+//  OF-extend Revision: $Id: solvePDECommon.C,v 85a31f6eb964 2011-12-08 09:21:38Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -29,14 +29,6 @@ License
 
 #include "polyMesh.H"
 
-#include "volFields.H"
-
-#include "FieldValueExpressionDriver.H"
-
-#include "fvScalarMatrix.H"
-
-#include "fvm.H"
-
 namespace Foam {
     defineTypeNameAndDebug(solvePDECommon,0);
 }
@@ -59,7 +51,8 @@ Foam::solvePDECommon::solvePDECommon
     const bool loadFromFiles
 ):
     active_(true),
-    obr_(obr)
+    obr_(obr),
+    name_(name)
 {
     if (!isA<polyMesh>(obr))
     {
@@ -76,52 +69,12 @@ Foam::solvePDECommon::~solvePDECommon()
 void Foam::solvePDECommon::read(const dictionary& dict)
 {
     if(active_) {
-        const fvMesh& mesh = refCast<const fvMesh>(obr_);
-        
         solveAt_=
             solveAtNames_.read(
                 dict.lookup("solveAt")
             );
         fieldName_=word(dict.lookup("fieldName"));
-        if(
-            theField_.valid()
-            &&
-            fieldName_!=theField_->name()
-        ) {
-            WarningIn("Foam::solvePDECommon::read(const dictionary& dict)")
-                << "Throwing out field " << theField_->name()
-                    << " and loading " << fieldName_ << ". "
-                    << "This might lead to unpredicatable behaviour" << endl;
-            theField_.clear();
-        }
-        if(!theField_.valid()) {
-            theField_.set(
-                new volScalarField(
-                    IOobject (
-                        fieldName_,
-                        mesh.time().timeName(),
-                        mesh,
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    mesh
-                )
-            );
-        }
 
-        driver_.set(
-            new FieldValueExpressionDriver(
-                mesh.time().timeName(),
-                mesh.time(),
-                mesh,
-                false, // no caching. No need
-                true,  // search fields in memory
-                false  // don't look up files in memory
-            )
-        );
-
-        driver_->readVariablesAndTables(dict);
-        
         steady_=readBool(dict.lookup("steady"));
     }
 }
@@ -129,7 +82,14 @@ void Foam::solvePDECommon::read(const dictionary& dict)
 void Foam::solvePDECommon::execute()
 {
     if(solveAt_==saTimestep) {
+        const fvMesh& mesh = refCast<const fvMesh>(obr_);
+
         solve();
+
+        // as this is executed after the general write, write the field separately 
+        if(mesh.time().outputTime()) {
+            writeData();
+        }
     }
 }
 
@@ -148,7 +108,8 @@ void Foam::solvePDECommon::write()
         mesh.time().outputTime()
     ) {
         solve();
-        theField_->write();
+
+        writeData();
     }
 }
 

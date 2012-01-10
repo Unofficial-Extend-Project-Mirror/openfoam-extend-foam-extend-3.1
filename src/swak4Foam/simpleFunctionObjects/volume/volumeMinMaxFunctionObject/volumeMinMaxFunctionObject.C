@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeMinMaxFunctionObject.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeMinMaxFunctionObject.C,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -90,9 +90,12 @@ Field<tensor> volumeMinMaxFunctionObject::process(const word& fieldName,tensor p
     return minMax(fieldName,preset);
 }
 
-string volumeMinMaxFunctionObject::firstLine()
+stringList volumeMinMaxFunctionObject::columnNames()
 {
-    return " minimum maximum";
+    stringList result(2);
+    result[0]="minimum";
+    result[1]="maximum";
+    return result;
 }
 
 } // namespace Foam

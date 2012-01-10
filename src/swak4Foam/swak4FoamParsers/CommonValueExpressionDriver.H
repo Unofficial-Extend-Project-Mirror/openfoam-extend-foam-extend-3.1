@@ -37,7 +37,7 @@ SourceFiles
     CommonValueExpressionDriverI.H
     CommonValueExpressionDriver.C
 
- ICE Revision: $Id: CommonValueExpressionDriver.H,v fa2cbb8abd0d 2011-07-31 21:05:07Z bgschaid $ 
+ ICE Revision: $Id: CommonValueExpressionDriver.H,v 4862984d1690 2011-11-24 22:45:11Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #ifndef CommonValueExpressionDriver_H
@@ -60,6 +60,8 @@ namespace Foam
                            Class CommonValueExpressionDriver Declaration
 \*---------------------------------------------------------------------------*/
 
+class ExpressionDriverWriter;
+
 class CommonValueExpressionDriver
 {
     // Private data
@@ -71,6 +73,12 @@ class CommonValueExpressionDriver
 
     //- variables from a dictionary
     stringList variableStrings_;
+
+    //- this one is in charge for writing and restoring 
+
+    //- by using it this class doesn't have to inherit from regIOobject 
+    //- (which would be an overkill and inconvenient)
+    autoPtr<ExpressionDriverWriter> writer_;
 
 protected:
 
@@ -124,11 +132,21 @@ protected:
     static const fvMesh &regionMesh
     (
         const dictionary &dict,
-        const fvMesh &mesh
+        const fvMesh &mesh,
+        bool readIfNecessary
     );
 
     //- look through the current variable values and update the stored variables
     void updateStoredVariables(bool force=false);
+
+    //- read data from the writer
+    virtual void getData(const dictionary &);
+
+    //- write data
+    virtual void prepareData(dictionary &) const;
+
+    //- do we need a datafile written
+    virtual bool hasDataToWrite() const;
 
 private:
     //- keep fields read from disc in memory
@@ -293,6 +311,9 @@ public:
 
     ExpressionResult getUniform(label size,bool noWarning);
 
+    template<template<class> class BinOp,class Type>
+    inline Type getReduced(BinOp<Type> op,Type initial=pTraits<Type>::zero);
+
     void clearResult();
 
     template <class Op,class Type>
@@ -386,6 +407,15 @@ public:
         bool scanning,
         bool parsing
     );
+
+    //- create a writer for this object
+    void createWriterAndRead(const word &name);
+
+    //- Write data if apropriate
+    //- Should enable exact restarts
+    void tryWrite() const;
+
+    friend class ExpressionDriverWriter;
 };
 
 

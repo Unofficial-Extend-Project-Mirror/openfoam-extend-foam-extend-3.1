@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: ExpressionResult.C,v 03834c120777 2011-09-08 11:36:21Z bgschaid $ 
+ ICE Revision: $Id: ExpressionResult.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "ExpressionResult.H"
@@ -91,7 +91,7 @@ ExpressionResult::ExpressionResult(
                 FatalErrorIn("ExpressionResult::ExpressionResult(const dictionary &dict)")
                     << "Don't know how to read data type " << valType_ 
                         << " as a single value" << endl
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
         } else {
             if(valType_==pTraits<scalar>::typeName) {
@@ -109,7 +109,7 @@ ExpressionResult::ExpressionResult(
             } else {
                 FatalErrorIn("ExpressionResult::ExpressionResult(const dictionary &dict)")
                     << "Don't know how to read data type " << valType_ << endl
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
         }
     }
@@ -179,20 +179,20 @@ ExpressionResult ExpressionResult::getUniform(const label size,bool noWarn) cons
         } else if(valType_==pTraits<bool>::typeName) {
             FatalErrorIn("ExpressionResult::getUniformInternal<bool>(const label size,bool noWarn)")
                 << "This specialisation is not implemented"
-                    << endl << abort(FatalError);
+                    << endl << exit(FatalError);
 
             return ExpressionResult(); // makes warnings go away
         } else {
             FatalErrorIn("ExpressionResult::getUniform()")
                 << "Unknown type " << valType_ << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
 
             return ExpressionResult(); // makes warnings go away
         }
     } else {
         FatalErrorIn("ExpressionResult::getUniform()")
             << "Not set. Can't construct an uniform value" << endl
-                << abort(FatalError);
+                << exit(FatalError);
 
         return ExpressionResult(); // makes warnings go away
     }
@@ -205,7 +205,7 @@ void ExpressionResult::operator=(const ExpressionResult& rhs)
     {
         FatalErrorIn("ExpressionResult::operator=(const ExpressionResult&)")
             << "Attempted assignment to self"
-            << abort(FatalError);
+            << exit(FatalError);
     }
 
     clearResult();
@@ -231,7 +231,7 @@ void ExpressionResult::operator=(const ExpressionResult& rhs)
             FatalErrorIn("ExpressionResult::operator=(const ExpressionResult& rhs)")
                 << " Type " << valType_ << " can not be copied"
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
         }
     } else {
         valPtr_=rhs.valPtr_;

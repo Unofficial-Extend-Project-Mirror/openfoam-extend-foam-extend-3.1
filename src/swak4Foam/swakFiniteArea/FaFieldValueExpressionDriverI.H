@@ -1,9 +1,10 @@
-//  ICE Revision: $Id: FaFieldValueExpressionDriverI.H,v 942e8def1dae 2011-03-19 16:24:43Z bgschaid $ 
+//  ICE Revision: $Id: FaFieldValueExpressionDriverI.H,v ba98e2dfa232 2011-12-11 21:38:35Z bgschaid $ 
 
 #ifndef VALUE_EXPRESSION_DRIVER_I_H
 #define VALUE_EXPRESSION_DRIVER_I_H
 
 #include "fixedValueFaPatchFields.H"
+#include "fixedValueFaePatchFields.H"
 #include "zeroGradientFaPatchFields.H"
 
 namespace Foam {
@@ -94,7 +95,7 @@ T *FaFieldValueExpressionDriver::getField(const string &name)
         FatalErrorIn("FaFieldValueExpressionDriver::getField(const string &name)")
             << "Could not find the field " << name 
                 << " in memory or on disc" << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
     
     f->dimensions().reset(nullDim);
@@ -150,7 +151,7 @@ void FaFieldValueExpressionDriver::makePatches
         ) 
         && 
         (
-            typeid(patch)==typeid(fvPatch)
+            typeid(patch)==typeid(faPatch)
         )
     ) {
         if(isValuePatch){
@@ -168,6 +169,100 @@ void FaFieldValueExpressionDriver::makePatches
   forAll(bf,i) {
       bf.set(i,bfNew[i]);
   }
+}
+
+template<class T>
+void FaFieldValueExpressionDriver::makePatches
+(
+    GeometricField<T,faePatchField,edgeMesh> &field,
+    bool keepPatches,
+    const wordList &fixedPatches
+) {
+  typename GeometricField<T,faePatchField,edgeMesh>::GeometricBoundaryField &bf=field.boundaryField();
+  List<faePatchField<T> *>bfNew(bf.size());
+
+  forAll(bf,patchI) {
+    const faPatch &patch=bf[patchI].patch();
+
+    bool isValuePatch=false;
+    forAll(fixedPatches,i) {
+      if(fixedPatches[i]==patch.name()) {
+	isValuePatch=true;
+      }
+    }
+
+    if(
+        (
+            !keepPatches 
+            || 
+            isValuePatch
+        ) 
+        && 
+        (
+            typeid(patch)==typeid(faPatch)
+        )
+    ) {
+        if(isValuePatch){
+            bfNew[patchI]=new fixedValueFaePatchField<T>(patch,field);  
+        } else {
+            // this is different because there is no zeroGradient for edge fields
+            bfNew[patchI]=new calculatedFaePatchField<T>(patch,field);      
+        }
+    } else {
+        bfNew[patchI]=bf[patchI].clone().ptr();
+    }
+  }
+
+  bf.clear();
+  bf.setSize(bfNew.size());
+  forAll(bf,i) {
+      bf.set(i,bfNew[i]);
+  }
+}
+
+
+template<class T>
+void FaFieldValueExpressionDriver::copyCalculatedPatches
+(
+    GeometricField<T,faPatchField,areaMesh> &field,
+    const GeometricField<T,faPatchField,areaMesh> &orig
+) {
+    typename GeometricField<T,faPatchField,areaMesh>::GeometricBoundaryField &bf=field.boundaryField();
+    List<faPatchField<T> *>bfNew(bf.size());
+    
+    forAll(bf,patchI) {
+        faPatchField<T> &pf=bf[patchI];
+        
+        if(
+            typeid(pf)==typeid(calculatedFaPatchField<T>)
+        ) {
+            pf==pf.patchInternalField();
+        }
+    }
+    //    field.correctBoundaryConditions();
+}
+
+template<class T>
+void FaFieldValueExpressionDriver::copyCalculatedPatches
+(
+    GeometricField<T,faePatchField,edgeMesh> &field,
+    const GeometricField<T,faePatchField,edgeMesh> &orig
+) {
+    typename GeometricField<T,faePatchField,edgeMesh>::GeometricBoundaryField &bf=field.boundaryField();
+    const typename GeometricField<T,faePatchField,edgeMesh>::GeometricBoundaryField &bfOrig=orig.boundaryField();
+
+    forAll(bf,patchI) {
+        faePatchField<T> &pf=bf[patchI];
+        const faePatchField<T> &pfOrig=bfOrig[patchI];
+        
+        if(
+            typeid(pf)==typeid(calculatedFaePatchField<T>)
+            &&
+            typeid(pfOrig)==typeid(calculatedFaePatchField<T>)
+        ) {
+            pf==pfOrig;
+        }
+    }
 }
 
 template<class T>
@@ -198,13 +293,63 @@ void FaFieldValueExpressionDriver::setValuePatches
         ) 
         && 
         (
-            typeid(patch)==typeid(fvPatch)
+            typeid(patch)==typeid(faPatch)
         )
     ) {
         if(typeid(field.boundaryField()[patchI])==typeid(fixedValueFaPatchField<T>)) {
             faPatchField<T> &pf=field.boundaryField()[patchI];
             
             pf==pf.patchInternalField();
+        }
+    }
+  }
+}
+
+template<class T>
+void FaFieldValueExpressionDriver::setValuePatches
+(
+    GeometricField<T,faePatchField,edgeMesh> &field,
+    bool keepPatches,
+    const wordList &fixedPatches
+) {
+  typename GeometricField<T,faePatchField,edgeMesh>::GeometricBoundaryField &bf=field.boundaryField();
+  List<faePatchField<T> *>bfNew(bf.size());
+
+  forAll(bf,patchI) {
+    const faPatch &patch=bf[patchI].patch();
+
+    bool isValuePatch=false;
+    forAll(fixedPatches,i) {
+      if(fixedPatches[i]==patch.name()) {
+	isValuePatch=true;
+      }
+    }
+
+    if(
+        (
+            !keepPatches 
+            ||
+            isValuePatch
+        ) 
+        && 
+        (
+            typeid(patch)==typeid(faPatch)
+        )
+    ) {
+        if(typeid(field.boundaryField()[patchI])==typeid(fixedValueFaePatchField<T>)) {
+            faePatchField<T> &pf=field.boundaryField()[patchI];
+            //            pf==pf.patchInternalField();
+            WarningIn(
+                "FaFieldValueExpressionDriver::setValuePatches"
+                "("
+                "GeometricField<T,faePatchField,edgeMesh> &field,"
+                "bool keepPatches,"
+                "const wordList &fixedPatches"
+                ")" 
+            ) << "There is no patchInternalField() for faePatchField. " 
+                << "Nothing done for patch " << patch.name() 
+                << " but setting it to " << pTraits<T>::zero << endl;            
+            pf==pTraits<T>::zero;
         }
     }
   }
@@ -235,7 +380,7 @@ inline FType *FaFieldValueExpressionDriver::makeField(const Field<typename FType
             << "Size " << val.size() << " of the assigned field is not the required "
                 << f->internalField().size()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
 
     f->internalField()=val;
@@ -264,6 +409,86 @@ inline FType *FaFieldValueExpressionDriver::makeConstantField(const typename FTy
     );
 
     return f;
+}
+
+template<class T>
+void FaFieldValueExpressionDriver::setResult(T *r,bool isSurfaceField) 
+{
+    resultField_.reset(r);
+
+    //    T &result=dynamicCast<T &>(resultField_()); // doesn't work with gcc 4.2
+
+    T &result=dynamic_cast<T &>(resultField_());
+
+    if(!resultDimension_.dimensionless()) {
+        result.dimensions().reset(resultDimension_);
+    }
+
+    typ_=pTraits<T>::typeName;
+
+    result_.setResult(result.internalField());
+
+    isLogical_=false;
+    isSurfaceField_=isSurfaceField;
+}
+
+template<class T>
+void FaFieldValueExpressionDriver::setLogicalResult(T *r,bool isSurfaceField) 
+{
+    resultField_.reset(r);
+
+    //    T &result=dynamicCast<T &>(resultField_()); // doesn't work with gcc 4.2
+
+    T &result=dynamic_cast<T &>(resultField_());
+
+    if(!resultDimension_.dimensionless()) {
+        result.dimensions().reset(resultDimension_);
+    }
+
+    typ_=pTraits<bool>::typeName;
+
+    Field<bool> yesOrNo(result.internalField().size());
+    forAll(yesOrNo,i) {
+        yesOrNo[i]=mag(result.internalField()[i])>SMALL;
+    }
+
+    result_.setResult(yesOrNo);
+
+    isLogical_=true;
+    isSurfaceField_=isSurfaceField;
+}
+
+template<class T>
+const T &FaFieldValueExpressionDriver::getResult() 
+{
+    if(!resultField_.valid()) {
+        FatalErrorIn("FaFieldValueExpressionDriver::getResult()")
+            << "When asking for a " << pTraits<T>::typeName
+                << ": No result present"
+                << endl
+                << exit(FatalError);
+    }
+
+    //    return dynamicCast<const T &>(resultField_()); // doesn't work with gcc 4.2
+    return dynamic_cast<const T &>(resultField_());
+}
+
+template<class T>
+bool FaFieldValueExpressionDriver::resultIsTyp(bool isLogical) 
+{
+    if(!resultField_.valid()) {
+        FatalErrorIn("FaFieldValueExpressionDriver::isTyp(bool isLogical)")
+            << "When asking for a " << pTraits<T>::typeName
+                << ": No result present"
+                << endl
+                << exit(FatalError);
+    }
+
+    return (
+        resultField_().type() == pTraits<T>::typeName
+        &&
+        isLogical == isLogical_
+    );
 }
 
 } // end namespace

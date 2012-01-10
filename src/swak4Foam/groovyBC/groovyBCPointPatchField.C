@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: groovyBCPointPatchField.C,v 90138ec97ef3 2011-09-26 18:42:41Z bgschaid $ 
+ ICE Revision: $Id: groovyBCPointPatchField.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "groovyBCPointPatchField.H"
@@ -50,7 +50,7 @@ const fvPatch &getFvPatch(const pointPatch &pp) {
             << " This will only work if I can find a fvMesh, but I only found a "
                 << typeid(pp.boundaryMesh().mesh().db()).name()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
     const fvMesh &fv=dynamic_cast<const fvMesh &>(pp.boundaryMesh().mesh().db());
     return fv.boundary()[pp.index()];
@@ -116,6 +116,11 @@ groovyBCPointPatchField<Type>::groovyBCPointPatchField
 
     //    this->refGrad() = pTraits<Type>::zero;
     this->valueFraction() = 1;
+
+    if(this->evaluateDuringConstruction()) {
+        // make sure that this works with potentialFoam or other solvers that don't evaluate the BCs
+        this->evaluate();
+    }
 }
 
 

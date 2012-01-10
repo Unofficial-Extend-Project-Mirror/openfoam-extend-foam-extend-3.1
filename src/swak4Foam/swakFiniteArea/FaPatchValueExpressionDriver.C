@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: FaPatchValueExpressionDriver.C,v 126dba3d68b9 2011-01-03 12:24:39Z bgschaid $ 
+ ICE Revision: $Id: FaPatchValueExpressionDriver.C,v c41b39061598 2011-12-07 09:36:46Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "FaPatchValueExpressionDriver.H"
@@ -71,7 +71,7 @@ label getPatchID(const faMesh &mesh,const word &name)
             << "The patch " << name << " was not found in "
                 << mesh.boundary().names()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
 
     }
     return result;
@@ -81,9 +81,19 @@ FaPatchValueExpressionDriver::FaPatchValueExpressionDriver(const dictionary& dic
  :
     FaCommonValueExpressionDriver(dict),
     patch_(
-        faRegionMesh(regionMesh(dict,mesh)).boundary()[
+        faRegionMesh(
+            regionMesh(
+                dict,
+                mesh,
+                searchOnDisc()
+            )).boundary()[
             getPatchID(
-                faRegionMesh(regionMesh(dict,mesh)),
+                faRegionMesh(
+                    regionMesh(
+                        dict,
+                        mesh,
+                        searchOnDisc()
+                    )),
                 dict.lookup(
                     "faPatchName"
                 )

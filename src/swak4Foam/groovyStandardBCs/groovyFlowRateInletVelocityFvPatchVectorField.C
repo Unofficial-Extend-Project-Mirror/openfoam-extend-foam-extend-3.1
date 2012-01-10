@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: groovyFlowRateInletVelocityFvPatchVectorField.C,v b62fab3bce62 2011-02-22 19:50:22Z bgschaid $ 
+ ICE Revision: $Id: groovyFlowRateInletVelocityFvPatchVectorField.C,v d36ab5f6c331 2011-11-13 20:23:44Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "groovyFlowRateInletVelocityFvPatchVectorField.H"
@@ -80,7 +80,8 @@ groovyFlowRateInletVelocityFvPatchVectorField
     flowRateInletVelocityFvPatchVectorField(p, iF, dict),
     flowRateExpression_(dict.lookup("flowRateExpression")),
     driver_(dict,this->patch())
-{}
+{
+}
 
 
 Foam::

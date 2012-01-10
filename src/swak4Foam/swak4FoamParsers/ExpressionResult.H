@@ -38,11 +38,16 @@ SourceFiles
     ExpressionResult.C
     ExpressionResultIO.C
 
- ICE Revision: $Id: ExpressionResult.H,v d23afdc7d21f 2011-09-08 09:00:53Z bgschaid $ 
+ ICE Revision: $Id: ExpressionResult.H,v 8915ad7d61bf 2011-12-24 13:47:38Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #ifndef ExpressionResult_H
 #define ExpressionResult_H
+
+#include "foamVersion4swak.H"
+#if (FOAM_VERSION4SWAK_MAJOR > 1)
+#error "This swak4Foam-version is only used for the 1.x-versions of OpenFOAM. For higher versions there is a special branch"
+#endif
 
 #include "Field.H"
 #include "dimensionedType.H"
@@ -127,6 +132,9 @@ public:
 
     // Construct a uniform field from the current results
     ExpressionResult getUniform(const label size,bool noWarn) const;
+
+    template<template<class> class BinOp,class Type>
+    inline Type getReduced(BinOp<Type> op,Type initial=pTraits<Type>::zero);
 
     void clearResult();
 

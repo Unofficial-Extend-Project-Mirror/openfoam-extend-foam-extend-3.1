@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: solveLaplacianPDE.H,v 3bbfd78ce86b 2011-09-28 17:29:20Z bgschaid $ 
+//  OF-extend Revision: $Id: solveLaplacianPDE.H,v 85a31f6eb964 2011-12-08 09:21:38Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -37,14 +37,14 @@ SourceFiles
 #ifndef solveLaplacianPDE_H
 #define solveLaplacianPDE_H
 
-#include "solvePDECommon.H"
+#include "solvePDECommonFiniteVolume.H"
 
 namespace Foam
 {
 
 class solveLaplacianPDE
 :
-    public solvePDECommon
+    public solvePDECommonFiniteVolume
 {
     //- Disallow default bitwise copy construct
     solveLaplacianPDE(const solveLaplacianPDE&);

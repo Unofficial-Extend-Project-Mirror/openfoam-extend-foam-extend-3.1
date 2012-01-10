@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: pythonIntegrationFunctionObject.C,v f6be1cc00dc4 2011-08-25 12:42:32Z bgschaid $ 
+//  OF-extend Revision: $Id: pythonIntegrationFunctionObject.C,v f6b6f366438b 2011-11-29 22:16:09Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -63,11 +63,7 @@ pythonIntegrationFunctionObject::pythonIntegrationFunctionObject
         return;
     }
 
-    PyObject *m = PyImport_AddModule("__main__");
-
-    PyObject_SetAttrString(m,"caseDir",PyString_FromString(t.path().c_str()));
-    PyObject_SetAttrString(m,"parRun",PyBool_FromLong(Pstream::parRun()));
-    PyObject_SetAttrString(m,"myProcNo",PyInt_FromLong(Pstream::myProcNo()));
+    initEnvironment(t);
 
     setRunTime();
 

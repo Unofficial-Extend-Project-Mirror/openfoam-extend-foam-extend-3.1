@@ -1,12 +1,14 @@
-//  ICE Revision: $Id: FieldValueExpressionDriverI.H,v 350a8c69a7e2 2011-05-26 22:34:49Z bgschaid $ 
+//  ICE Revision: $Id: FieldValueExpressionDriverI.H,v 4e13940a97f6 2011-11-30 11:01:04Z bgschaid $ 
 
 #ifndef VALUE_EXPRESSION_DRIVER_I_H
 #define VALUE_EXPRESSION_DRIVER_I_H
 
 #include "wallFvPatch.H"
 #include "fixedValueFvPatchFields.H"
+#include "fixedValueFvsPatchFields.H"
 #include "zeroGradientFvPatchFields.H"
 #include "calculatedFvPatchFields.H"
+#include "calculatedFvsPatchFields.H"
 
 namespace Foam {
 
@@ -61,8 +63,7 @@ void FieldValueExpressionDriver::makePatches
         (
             typeid(patch)==typeid(wallFvPatch)
             || 
-            typeid(patch)==typeid(fvPatch
-            )
+            typeid(patch)==typeid(fvPatch)
         )
     ) {
         if(isValuePatch){
@@ -82,10 +83,64 @@ void FieldValueExpressionDriver::makePatches
   }
 }
 
+// code duplication from the template above
+template<class T>
+void FieldValueExpressionDriver::makePatches
+(
+    GeometricField<T,fvsPatchField,surfaceMesh> &field,
+    bool keepPatches,
+    const wordList &fixedPatches
+) {
+  typename GeometricField<T,fvsPatchField,surfaceMesh>::GeometricBoundaryField &bf=field.boundaryField();
+  List<fvsPatchField<T> *>bfNew(bf.size());
+
+  forAll(bf,patchI) {
+    const fvPatch &patch=bf[patchI].patch();
+
+    bool isValuePatch=false;
+    forAll(fixedPatches,i) {
+      if(fixedPatches[i]==patch.name()) {
+	isValuePatch=true;
+      }
+    }
+
+    if(
+        (
+            !keepPatches 
+            || 
+            isValuePatch
+        ) 
+        && 
+        (
+            typeid(patch)==typeid(wallFvPatch)
+            || 
+            typeid(patch)==typeid(fvPatch)
+        )
+    ) {
+        if(isValuePatch){
+            bfNew[patchI]=new fixedValueFvsPatchField<T>(patch,field);  
+        } else {
+            // this is the only line that is REALLY different
+            bfNew[patchI]=new calculatedFvsPatchField<T>(patch,field);
+            (*bfNew[patchI])==bf[patchI];
+        }
+    } else {
+        bfNew[patchI]=bf[patchI].clone().ptr();
+    }
+  }
+
+  bf.clear();
+  bf.setSize(bfNew.size());
+  forAll(bf,i) {
+      bf.set(i,bfNew[i]);
+  }
+}
+
 template<class T>
 void FieldValueExpressionDriver::setCalculatedPatches
 (
-    GeometricField<T,fvPatchField,volMesh> &field
+    GeometricField<T,fvPatchField,volMesh> &field,
+    T unusedValue
 ) {
     typename GeometricField<T,fvPatchField,volMesh>::GeometricBoundaryField &bf=field.boundaryField();
     List<fvPatchField<T> *>bfNew(bf.size());
@@ -100,6 +155,72 @@ void FieldValueExpressionDriver::setCalculatedPatches
         }
     }
     field.correctBoundaryConditions();
+}
+
+template<class T>
+void FieldValueExpressionDriver::setCalculatedPatches
+(
+    GeometricField<T,fvsPatchField,surfaceMesh> &field,
+    T value
+) {
+    typename GeometricField<T,fvsPatchField,surfaceMesh>::GeometricBoundaryField &bf=field.boundaryField();
+    List<fvsPatchField<T> *>bfNew(bf.size());
+    
+    forAll(bf,patchI) {
+        fvsPatchField<T> &pf=bf[patchI];
+        
+        if(
+            typeid(pf)==typeid(calculatedFvsPatchField<T>)
+        ) {
+            //            pf==pf.patchInternalField();
+            pf==value;
+        }
+    }
+    //     field.correctBoundaryConditions();
+}
+
+template<class T>
+void FieldValueExpressionDriver::copyCalculatedPatches
+(
+    GeometricField<T,fvPatchField,volMesh> &field,
+    const GeometricField<T,fvPatchField,volMesh> &orig
+) {
+    typename GeometricField<T,fvPatchField,volMesh>::GeometricBoundaryField &bf=field.boundaryField();
+    List<fvPatchField<T> *>bfNew(bf.size());
+    
+    forAll(bf,patchI) {
+        fvPatchField<T> &pf=bf[patchI];
+        
+        if(
+            typeid(pf)==typeid(calculatedFvPatchField<T>)
+        ) {
+            pf==pf.patchInternalField();
+        }
+    }
+    //    field.correctBoundaryConditions();
+}
+
+template<class T>
+void FieldValueExpressionDriver::copyCalculatedPatches
+(
+    GeometricField<T,fvsPatchField,surfaceMesh> &field,
+    const GeometricField<T,fvsPatchField,surfaceMesh> &orig
+) {
+    typename GeometricField<T,fvsPatchField,surfaceMesh>::GeometricBoundaryField &bf=field.boundaryField();
+    const typename GeometricField<T,fvsPatchField,surfaceMesh>::GeometricBoundaryField &bfOrig=orig.boundaryField();
+
+    forAll(bf,patchI) {
+        fvsPatchField<T> &pf=bf[patchI];
+        const fvsPatchField<T> &pfOrig=bfOrig[patchI];
+        
+        if(
+            typeid(pf)==typeid(calculatedFvsPatchField<T>)
+            &&
+            typeid(pfOrig)==typeid(calculatedFvsPatchField<T>)
+        ) {
+            pf==pfOrig;
+        }
+    }
 }
 
 template<class T>
@@ -145,6 +266,60 @@ void FieldValueExpressionDriver::setValuePatches
   }
 }
 
+// Code duplication from above ... maybe there is a better way
+template<class T>
+void FieldValueExpressionDriver::setValuePatches
+(
+    GeometricField<T,fvsPatchField,surfaceMesh> &field,
+    bool keepPatches,
+    const wordList &fixedPatches
+) {
+  typename GeometricField<T,fvsPatchField,surfaceMesh>::GeometricBoundaryField &bf=field.boundaryField();
+  List<fvsPatchField<T> *>bfNew(bf.size());
+
+  forAll(bf,patchI) {
+    const fvPatch &patch=bf[patchI].patch();
+
+    bool isValuePatch=false;
+    forAll(fixedPatches,i) {
+      if(fixedPatches[i]==patch.name()) {
+	isValuePatch=true;
+      }
+    }
+
+    if(
+        (
+            !keepPatches 
+            ||
+            isValuePatch
+        ) 
+        && 
+        (
+            typeid(patch)==typeid(wallFvPatch)
+            ||
+            typeid(patch)==typeid(fvPatch
+            )
+        )
+    ) {
+        if(typeid(field.boundaryField()[patchI])==typeid(fixedValueFvsPatchField<T>)) {
+            fvsPatchField<T> &pf=field.boundaryField()[patchI];
+            //            pf==pf.patchInternalField();
+            WarningIn(
+                "FieldValueExpressionDriver::setValuePatches"
+                "("
+                "GeometricField<T,fvsPatchField,surfaceMesh> &field,"
+                "bool keepPatches,"
+                "const wordList &fixedPatches"
+                ")" 
+            ) << "There is no patchInternalField() for fvsPatchField. " 
+                << "Nothing done for patch " << patch.name() 
+                << " but setting it to " << pTraits<T>::zero << endl;
+            pf==pTraits<T>::zero;
+        }
+    }
+  }
+}
+
 template<class FType>
 inline FType *FieldValueExpressionDriver::makeField(const Field<typename FType::value_type> &val)
 {
@@ -170,7 +345,7 @@ inline FType *FieldValueExpressionDriver::makeField(const Field<typename FType::
             << "Size " << val.size() << " of the assigned field is not the required "
                 << f->internalField().size()
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
 
     f->internalField()=val;
@@ -186,6 +361,11 @@ inline FType *FieldValueExpressionDriver::makeConstantField(const typename FType
     std::ostringstream buff;
     buff << "constant" << pTraits<typename FType::value_type>::typeName;
 
+    word defaultBC="calculated";
+    if(pTraits<typename FType::PatchFieldType>::typeName=="fvPatchField") {
+        defaultBC="zeroGradient";
+    }
+
     FType *f=new FType(
         IOobject
         (
@@ -197,10 +377,93 @@ inline FType *FieldValueExpressionDriver::makeConstantField(const typename FType
         ),
         mesh_,
         val,
-        "zeroGradient"
+        defaultBC
     );
+    if(pTraits<typename FType::PatchFieldType>::typeName=="fvsPatchField") {
+        setCalculatedPatches(*f,val);
+    }
 
     return f;
+}
+
+template<class T>
+void FieldValueExpressionDriver::setResult(T *r,bool isSurfaceField) 
+{
+    resultField_.reset(r);
+
+    //    T &result=dynamicCast<T &>(resultField_()); // doesn't work with gcc 4.2
+
+    T &result=dynamic_cast<T &>(resultField_());
+
+    if(!resultDimension_.dimensionless()) {
+        result.dimensions().reset(resultDimension_);
+    }
+
+    typ_=pTraits<T>::typeName;
+
+    result_.setResult(result.internalField());
+
+    isLogical_=false;
+    isSurfaceField_=isSurfaceField;
+}
+
+template<class T>
+void FieldValueExpressionDriver::setLogicalResult(T *r,bool isSurfaceField) 
+{
+    resultField_.reset(r);
+
+    //    T &result=dynamicCast<T &>(resultField_()); // doesn't work with gcc 4.2
+
+    T &result=dynamic_cast<T &>(resultField_());
+
+    if(!resultDimension_.dimensionless()) {
+        result.dimensions().reset(resultDimension_);
+    }
+
+    typ_=pTraits<bool>::typeName;
+
+    Field<bool> yesOrNo(result.internalField().size());
+    forAll(yesOrNo,i) {
+        yesOrNo[i]=mag(result.internalField()[i])>SMALL;
+    }
+
+    result_.setResult(yesOrNo);
+
+    isLogical_=true;
+    isSurfaceField_=isSurfaceField;
+}
+
+template<class T>
+const T &FieldValueExpressionDriver::getResult() 
+{
+    if(!resultField_.valid()) {
+        FatalErrorIn("FieldValueExpressionDriver::getResult()")
+            << "When asking for a " << pTraits<T>::typeName
+                << ": No result present"
+                << endl
+                << exit(FatalError);
+    }
+
+    //    return dynamicCast<const T &>(resultField_()); // doesn't work with gcc 4.2
+    return dynamic_cast<const T &>(resultField_());
+}
+
+template<class T>
+bool FieldValueExpressionDriver::resultIsTyp(bool isLogical) 
+{
+    if(!resultField_.valid()) {
+        FatalErrorIn("FieldValueExpressionDriver::isTyp(bool isLogical)")
+            << "When asking for a " << pTraits<T>::typeName
+                << ": No result present"
+                << endl
+                << exit(FatalError);
+    }
+
+    return (
+        resultField_().type() == pTraits<T>::typeName
+        &&
+        isLogical == isLogical_
+    );
 }
 
 } // end namespace

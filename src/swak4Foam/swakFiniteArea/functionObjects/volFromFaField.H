@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: volFromFaField.H,v b400570d9219 2011-12-09 00:06:13Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -54,6 +54,7 @@ class dictionary;
 class mapPolyMesh;
 
 class FaFieldValueExpressionDriver;
+class regIOobject;
 
 class volFromFaField
 {
@@ -80,14 +81,11 @@ protected:
 
     const dictionary &dict_;
 
-    autoPtr<volVectorField> vectorField_;
+    autoPtr<regIOobject> field_;
 
-    autoPtr<volScalarField> scalarField_;
-
-    template<class T,class VF>
+    template<class T>
     void makeVolField(
-        const T &data,
-        autoPtr<VF> &store
+        const T &data
     );
 
     autoPtr<FaFieldValueExpressionDriver> driver_;

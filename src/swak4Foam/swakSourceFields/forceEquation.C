@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: forceEquation.C,v 4ac16d2f82d4 2011-03-12 01:20:08Z bgschaid $ 
+ ICE Revision: $Id: forceEquation.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "forceEquation.H"
@@ -58,6 +58,8 @@ forceEquation<T>::forceEquation
     maskExpression_(dict.lookup("maskExpression")),
     verbose_(dict.lookupOrDefault<bool>("verbose",true))
 {
+    createWriterAndRead(dict.name().name()+"_"+this->type()+"<"+pTraits<T>::typeName+">");
+
     if(verbose_) {
         WarningIn(string("forceEquation<") + pTraits<T>::typeName + ">::forceEquation") 
             << "Fixing to the values " << valueExpression_ 
@@ -81,14 +83,14 @@ template<class T>
 bool forceEquation<T>::getMask(DynamicList<label> &cellIDs,const word &psi)
 {
     parse(maskExpression_);
-    if(!resultIsLogical()) {
+    if(!resultIsTyp<volScalarField>(true)) {
         FatalErrorIn("forceEquation<scalar>::operator()(fvMatrix<T> &)")
             << "Result of " << maskExpression_ << " is not a logical expression"
                 << endl
-                << abort(FatalError);
+                << exit(FatalError);
     }
 
-    const volScalarField &cond=getScalar();
+    const volScalarField &cond=getResult<volScalarField>();
 
     forAll(cond,cellI) {
         if(cond[cellI]!=0) {
@@ -123,68 +125,34 @@ tmp<volScalarField> forceEquation<T>::getMask()
         (
             new volScalarField
             (
-                getScalar()
+                getResult<volScalarField>()
             )
         );
 }
 
-template<>
-void forceEquation<scalar>::operator()(fvMatrix<scalar> &eq)
-{
-    clearVariables();
-
-    DynamicList<label> cellIDs;
-
-    if(!getMask(cellIDs,eq.psi().name())) {
-        return;
-    }
-
-    Field<scalar> values(cellIDs.size());
-
-    parse(valueExpression_);
-    const volScalarField &calculated=getScalar();
-
-    forAll(cellIDs,i) {
-        values[i]=calculated[cellIDs[i]];
-    }
-
-    eq.setValues(cellIDs,values);
-}
-
-template<>
-void forceEquation<vector>::operator()(fvMatrix<vector> &eq)
-{
-    clearVariables();
-
-    DynamicList<label> cellIDs;
-
-    if(!getMask(cellIDs,eq.psi().name())) {
-        return;
-    }
-
-    Field<vector> values(cellIDs.size());
-
-    parse(valueExpression_);
-    const volVectorField &calculated=getVector();
-
-    forAll(cellIDs,i) {
-        values[i]=calculated[cellIDs[i]];
-    }
-
-    eq.setValues(cellIDs,values);
-}
-
-// Catch all for those not implemented
 template<class T>
-void forceEquation<T>::operator()(fvMatrix<T> &)
+void forceEquation<T>::operator()(fvMatrix<T> &eq)
 {
-    FatalErrorIn(
-        "forceEquation<T>operator()(fvMatrix<T> &)"
-    )
-        <<  "not implemented for for T="
-            << pTraits<T>::typeName
-            << endl
-            << abort(FatalError);
+    typedef GeometricField<T,fvPatchField,volMesh> resultField;
+
+    clearVariables();
+
+    DynamicList<label> cellIDs;
+
+    if(!getMask(cellIDs,eq.psi().name())) {
+        return;
+    }
+
+    Field<T> values(cellIDs.size());
+
+    parse(valueExpression_);
+    const resultField &calculated=getResult<resultField>();
+
+    forAll(cellIDs,i) {
+        values[i]=calculated[cellIDs[i]];
+    }
+
+    eq.setValues(cellIDs,values);
 }
 
 template

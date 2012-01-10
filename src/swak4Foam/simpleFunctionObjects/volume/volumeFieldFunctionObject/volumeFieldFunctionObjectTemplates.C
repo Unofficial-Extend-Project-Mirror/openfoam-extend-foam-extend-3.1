@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeFieldFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeFieldFunctionObjectTemplates.C,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -73,17 +73,9 @@ void volumeFieldFunctionObject::processAndWrite(const word& fieldName)
 
     if (Pstream::master())
     {
-        unsigned int w = IOstream::defaultPrecision() + 7;
-
-        OFstream& probeStream = *filePtrs_[fieldName];
-
-        probeStream << setw(w) << fld.time().value();
-
-        forAll(vals, probeI)
-        {
-            probeStream << setw(w) << vals[probeI];
-        }
-        probeStream << nl;
+        writeTime(fieldName,fld.time().value());
+        writeData(fieldName,vals);
+        endData(fieldName);
     }
 }
 

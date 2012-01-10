@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: solveTransportPDE.H,v 85a31f6eb964 2011-12-08 09:21:38Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -37,14 +37,14 @@ SourceFiles
 #ifndef solveTransportPDE_H
 #define solveTransportPDE_H
 
-#include "solvePDECommon.H"
+#include "solvePDECommonFiniteVolume.H"
 
 namespace Foam
 {
 
 class solveTransportPDE
 :
-    public solvePDECommon
+    public solvePDECommonFiniteVolume
 {
     //- Disallow default bitwise copy construct
     solveTransportPDE(const solveTransportPDE&);
@@ -63,8 +63,8 @@ protected:
     dimensionSet diffusionDimension_;
 
     //- the name of the phi-field. 
-    //- We'll have to use that until FieldExpressionDriver can return surface fields
-    word phiName_;
+    string phiExpression_;
+    dimensionSet phiDimension_;
 
     //- the right hand side
     string sourceExpression_;

@@ -27,7 +27,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
- ICE Revision: $Id: expressionSource.C,v 930c7e988ccc 2010-09-08 08:24:48Z bgschaid $ 
+ ICE Revision: $Id: expressionSource.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "expressionSource.H"
@@ -55,7 +55,9 @@ expressionSource<T>::expressionSource
 :
     FieldValueExpressionDriver(dict,mesh),
     expression_(dict.lookup("expression"))
-{}
+{
+    createWriterAndRead(dict.name().name()+"_"+this->type()+"<"+pTraits<T>::typeName+">");
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -67,51 +69,21 @@ expressionSource<T>::~expressionSource()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<>
-tmp<expressionSource<scalar>::resultField> expressionSource<scalar>::operator()()
-{
-    clearVariables();
-    parse(expression_);
-    if(!resultIsScalar()) {
-        FatalErrorIn("expressionSource<scalar>::operator()()")
-            << "Result of " << expression_ << " is not a scalar"
-                << endl
-                << abort(FatalError);
-    }
-
-    tmp<resultField> result(new resultField(getScalar()));
-    
-    return result;
-}
-
-template<>
-tmp<expressionSource<vector>::resultField> expressionSource<vector>::operator()()
-{
-    clearVariables();
-    parse(expression_);
-    if(!resultIsVector()) {
-        FatalErrorIn("expressionSource<vector>::operator()()")
-            << "Result of " << expression_ << " is not a vector"
-                << endl
-                << abort(FatalError);
-    }
-
-    tmp<resultField> result(new resultField(getVector()));
-
-    return result;
-}
-
-// Catch all for those not implemented
 template<class T>
 tmp<typename expressionSource<T>::resultField> expressionSource<T>::operator()()
 {
-    FatalErrorIn(
-        "expressionSource<T>operator()()"
-    )
-        <<  "not implemented for for T="
-            << pTraits<T>::typeName
-            << endl
-            << abort(FatalError);
+    clearVariables();
+    parse(expression_);
+    if(!resultIsTyp<resultField>()) {
+        FatalErrorIn("expressionSource<"+word(pTraits<T>::typeName)+">::operator()()")
+            << "Result of " << expression_ << " is not a " << pTraits<T>::typeName
+                << endl
+                << exit(FatalError);
+    }
+
+    tmp<resultField> result(new resultField(getResult<resultField>()));
+
+    return result;
 }
 
 template

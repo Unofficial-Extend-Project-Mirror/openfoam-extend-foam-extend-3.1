@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: swakExpressionFunctionObjectTemplates.C,v 7aac0fa2709a 2011-11-01 21:55:45Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -40,7 +40,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class T>
-void swakExpressionFunctionObject::writeData(CommonValueExpressionDriver &driver)
+void swakExpressionFunctionObject::writeTheData(CommonValueExpressionDriver &driver)
 {
     Field<T> result=driver.getResult<T>();
 
@@ -71,15 +71,9 @@ void swakExpressionFunctionObject::writeData(CommonValueExpressionDriver &driver
     }
 
     if (Pstream::master()) {
-        unsigned int w = IOstream::defaultPrecision() + 7;
-        
-        OFstream& o=*filePtrs_[name()];
-        
-        o << setw(w) << time().value();
-        forAll(results,i) {
-            o << setw(w) << results[i];
-        }
-        o << nl;
+        writeTime(name(),time().value());
+        writeData(name(),results);
+        endData(name());
     }
 }
 

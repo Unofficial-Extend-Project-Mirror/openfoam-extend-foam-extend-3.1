@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeIntegrateFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeIntegrateFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -64,7 +64,8 @@ Field<T> volumeIntegrateFunctionObject::integrate(const word& fieldName,T unsetV
     }
 
     if(verbose()) {
-        Info << " Integral of " << fieldName << " = "
+        Info<< regionString() 
+            << " Integral of " << fieldName << " = "
             << vals[0] << "  " 
             << fld.dimensions()*dimensionSet(0,3,0,0,0,0,0)
             << endl;

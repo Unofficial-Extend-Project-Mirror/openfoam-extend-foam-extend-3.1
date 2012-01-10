@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: solveTransportPDE.C,v 7d05213004c8 2011-12-08 11:35:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -48,7 +48,7 @@ Foam::solveTransportPDE::solveTransportPDE
     const dictionary& dict,
     const bool loadFromFiles
 ):
-    solvePDECommon(
+    solvePDECommonFiniteVolume(
         name,
         obr,
         dict,
@@ -56,6 +56,7 @@ Foam::solveTransportPDE::solveTransportPDE
     ),
     rhoDimension_(dimless),
     diffusionDimension_(dimless),
+    phiDimension_(dimless),
     sourceDimension_(dimless),
     sourceImplicitDimension_(dimless)
 {
@@ -79,7 +80,7 @@ Foam::solveTransportPDE::~solveTransportPDE()
 
 void Foam::solveTransportPDE::read(const dictionary& dict)
 {
-    solvePDECommon::read(dict);
+    solvePDECommonFiniteVolume::read(dict);
 
     if(active_) {
         if(!steady_) {
@@ -91,7 +92,7 @@ void Foam::solveTransportPDE::read(const dictionary& dict)
             dict.lookup("sourceImplicit") 
                 >> sourceImplicitExpression_ >> sourceImplicitDimension_;
         }
-        dict.lookup("phi") >> phiName_;
+        dict.lookup("phi") >> phiExpression_ >> phiDimension_;
     }
 }
 
@@ -109,32 +110,39 @@ void Foam::solveTransportPDE::solve()
             driver.clearVariables();
 
             driver.parse(diffusionExpression_);
-            if(!driver.resultIsScalar()) {
+            if(!driver.resultIsTyp<volScalarField>()) {
                 FatalErrorIn("Foam::solveTransportPDE::solve()")
                     << diffusionExpression_ << " does not evaluate to a scalar"
                         << endl
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
-            volScalarField diffusionField(driver.getScalar());
+            volScalarField diffusionField(driver.getResult<volScalarField>());
             diffusionField.dimensions().reset(diffusionDimension_);
 
             driver.parse(sourceExpression_);
-            if(!driver.resultIsScalar()) {
+            if(!driver.resultIsTyp<volScalarField>()) {
                 FatalErrorIn("Foam::solveTransportPDE::solve()")
                     << sourceExpression_ << " does not evaluate to a scalar"
                         << endl
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
-            volScalarField sourceField(driver.getScalar());
+            volScalarField sourceField(driver.getResult<volScalarField>());
             sourceField.dimensions().reset(sourceDimension_);
 
+            driver.parse(phiExpression_);
+            if(!driver.resultIsTyp<surfaceScalarField>()) {
+                FatalErrorIn("Foam::solveTransportPDE::solve()")
+                    << phiExpression_ << " does not evaluate to a surface scalar"
+                        << endl
+                        << exit(FatalError);
+            }
+            surfaceScalarField phiField(driver.getResult<surfaceScalarField>());
+            phiField.dimensions().reset(phiDimension_);
+
             volScalarField &f=theField_();
-            const surfaceScalarField &phi=mesh.lookupObject<surfaceScalarField>(
-                phiName_
-            );
 
             fvMatrix<scalar> eq(
-                fvm::div(phi,f)
+                fvm::div(phiField,f)
                 -fvm::laplacian(diffusionField,f,"laplacian(diffusion,"+f.name()+")")
                 ==
                 sourceField
@@ -142,13 +150,13 @@ void Foam::solveTransportPDE::solve()
 
             if(!steady_) {
                 driver.parse(rhoExpression_);
-                if(!driver.resultIsScalar()) {
+                if(!driver.resultIsTyp<volScalarField>()) {
                     FatalErrorIn("Foam::solveTransportPDE::solve()")
                         << rhoExpression_ << " does not evaluate to a scalar"
                             << endl
-                            << abort(FatalError);
+                            << exit(FatalError);
                 }
-                volScalarField rhoField(driver.getScalar());
+                volScalarField rhoField(driver.getResult<volScalarField>());
                 rhoField.dimensions().reset(rhoDimension_);
             
                 fvMatrix<scalar> ddtMatrix=fvm::ddt(f);
@@ -167,13 +175,13 @@ void Foam::solveTransportPDE::solve()
 
             if(sourceImplicitExpression_!="") {
                 driver.parse(sourceImplicitExpression_);
-                if(!driver.resultIsScalar()) {
+                if(!driver.resultIsTyp<volScalarField>()) {
                     FatalErrorIn("Foam::solveTransportPDE::solve()")
                         << sourceImplicitExpression_ << " does not evaluate to a scalar"
                             << endl
-                            << abort(FatalError);
+                            << exit(FatalError);
                 }
-                volScalarField sourceImplicitField(driver.getScalar());
+                volScalarField sourceImplicitField(driver.getResult<volScalarField>());
                 sourceImplicitField.dimensions().reset(sourceImplicitDimension_);
             
                 eq-=fvm::SuSp(sourceImplicitField,f);

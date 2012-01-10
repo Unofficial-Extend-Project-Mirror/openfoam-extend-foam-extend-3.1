@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchAverageFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: patchAverageFunctionObjectTemplates.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -70,7 +70,8 @@ Field<T> patchAverageFunctionObject::average(const word& fieldName,T unsetVal) c
     }
 
     if(verbose()) {
-        Info << " Averages of " << fieldName << " :";
+        Info<< regionString() 
+            << " Averages of " << fieldName << " :";
 
         forAll(patchNames_, patchI)
         {

@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: simpleFunctionObject.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: simpleFunctionObject.C,v eba4463c1f1c 2012-01-08 20:16:25Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -53,6 +53,11 @@ simpleFunctionObject::simpleFunctionObject
         ? readBool(dict.lookup("verbose"))
         : false
     ),
+    writeDebug_(
+        dict.found("writeDebug")
+        ? readBool(dict.lookup("writeDebug"))
+        : false
+    ),
     after_(
         dict.found("after")
         ? readScalar(dict.lookup("after"))
@@ -73,6 +78,11 @@ simpleFunctionObject::simpleFunctionObject
     ),
     obr_(time_.lookupObject<objectRegistry>(regionName_))
 {
+    if(regionName_==polyMesh::defaultRegion) {
+        regionString_ = "";
+    } else {
+        regionString_ = " Region: "+regionName_+" :";
+    }
 }
 
 

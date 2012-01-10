@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchExpressionFunctionObject.H,v 04f8374cd7a7 2011-04-09 16:16:45Z bgschaid $ 
+//  OF-extend Revision: $Id: patchExpressionFunctionObject.H,v b61ee1fe6099 2011-11-01 22:02:16Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -82,12 +82,12 @@ protected:
 
     word dirName();
 
-    string firstLine();
+    stringList columnNames();
 
     wordList fileNames();
 
     template<class T>
-    void writeData(const word &pName,PatchValueExpressionDriver &driver);
+    void writeTheData(const word &pName,PatchValueExpressionDriver &driver);
 public:
 
     //- Runtime type information

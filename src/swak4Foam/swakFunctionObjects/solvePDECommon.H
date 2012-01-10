@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id$ 
+//  OF-extend Revision: $Id: solvePDECommon.H,v 85a31f6eb964 2011-12-08 09:21:38Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -48,7 +48,6 @@ namespace Foam
 class objectRegistry;
 class dictionary;
 class mapPolyMesh;
-class FieldValueExpressionDriver;
 
 class solvePDECommon
 {
@@ -72,20 +71,20 @@ protected:
     //- mesh where the set goes
     const objectRegistry& obr_;
 
+    //- name of the function object
+    const word name_;
+
     //- name of the field that is being solved for 
     word fieldName_;
-
-    //- the actual field
-    autoPtr<volScalarField> theField_;
-
-    //- the driver that calculates the coefficients
-    autoPtr<FieldValueExpressionDriver> driver_;
 
     //- is this a steady calculation
     bool steady_;
 
     //- do the actual solving
     virtual void solve() = 0;
+
+    //- write specific data
+    virtual void writeData() = 0;
 
     static const NamedEnum<solveAt,3> solveAtNames_;
     solveAt solveAt_;

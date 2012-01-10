@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: patchFunctionObject.H,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: patchFunctionObject.H,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -68,7 +68,7 @@ protected:
     //- indizes of the patches
     List<label> patchIndizes_;
 
-    virtual string firstLine();
+    virtual stringList columnNames();
 public:
 
     //- Runtime type information

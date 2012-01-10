@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: panicDumpFunctionObjectTemplates.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: panicDumpFunctionObjectTemplates.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -91,7 +91,7 @@ bool panicDumpFunctionObject::check() const
                     << " exceeds the valid limits [ " << minimum_ << " , " 
                     << maximum_ << " ] with the current limits [ " 
                     << mini << " , " << maxi << " ]\n" << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
         }
 
         return true;

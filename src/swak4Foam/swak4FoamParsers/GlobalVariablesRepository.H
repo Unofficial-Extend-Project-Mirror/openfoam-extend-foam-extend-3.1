@@ -36,7 +36,7 @@ Description
 SourceFiles
     GlobalVariablesRepository.C
 
- ICE Revision: $Id: GlobalVariablesRepository.H,v e6329119f8a6 2011-08-20 20:54:24Z bgschaid $ 
+ ICE Revision: $Id: GlobalVariablesRepository.H,v 7391ceee8fdc 2011-10-15 23:29:18Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #ifndef GlobalVariablesRepository_H
@@ -97,7 +97,8 @@ public:
     );
 
     void addValue(
-        const dictionary &dict
+        const dictionary &dict,
+        const word scope=""
     );
 
     //- get a global namespace

@@ -1,4 +1,4 @@
-//  OF-extend Revision: $Id: volumeIntegrateFunctionObject.C,v 659656117ae8 2011-06-29 04:56:04Z bgschaid $ 
+//  OF-extend Revision: $Id: volumeIntegrateFunctionObject.C,v e47dcd464b91 2011-11-01 19:14:37Z bgschaid $ 
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -90,9 +90,9 @@ Field<tensor> volumeIntegrateFunctionObject::process(const word& fieldName,tenso
     return integrate(fieldName,preset);
 }
 
-string volumeIntegrateFunctionObject::firstLine()
+stringList volumeIntegrateFunctionObject::columnNames()
 {
-    return " integrale";
+    return stringList(1,"integrale");
 }
 
 } // namespace Foam

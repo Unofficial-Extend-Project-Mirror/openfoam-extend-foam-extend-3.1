@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: FaceSetValueExpressionDriver.C,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: FaceSetValueExpressionDriver.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "FaceSetValueExpressionDriver.H"
@@ -96,7 +96,11 @@ FaceSetValueExpressionDriver::FaceSetValueExpressionDriver(const dictionary& dic
     SetSubsetValueExpressionDriver(dict,dict.lookup("setName"),INVALID),
     faceSet_(
         getSet<faceSet>(
-            regionMesh(dict,mesh),
+            regionMesh(
+                dict,
+                mesh,
+                searchOnDisc()
+            ),
             dict.lookup("setName"),
             origin_
         )
@@ -171,7 +175,7 @@ scalarField *FaceSetValueExpressionDriver::makeCellVolumeField()
     FatalErrorIn("FaceSetValueExpressionDriver::makeCellVolumeField()")
         << "faceSet knows nothing about cells"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
     return new scalarField(0);
 }
 
@@ -241,7 +245,7 @@ scalarField *FaceSetValueExpressionDriver::makeFaceFlipField()
                         << " nei:" << mesh.faceNeighbour()[faceI]
                         << " NeiInCellSet:"
                         << cells.found(mesh.faceNeighbour()[faceI])
-                        << abort(FatalError);
+                        << exit(FatalError);
             }
         }
         else

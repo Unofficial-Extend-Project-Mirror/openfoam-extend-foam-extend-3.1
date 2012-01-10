@@ -10,8 +10,12 @@ createSampledSet.C
 createSampledSetFunctionObject.C
 addGlobalVariable.C
 addGlobalVariableFunctionObject.C
+calculateGlobalVariables.C
+calculateGlobalVariablesFunctionObject.C
 
 solvePDECommon.C
+solvePDECommonFiniteVolume.C
+
 solveLaplacianPDE.C
 solveLaplacianPDEFunctionObject.C
 solveTransportPDE.C

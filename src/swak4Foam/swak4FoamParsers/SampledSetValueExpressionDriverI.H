@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id: SampledSetValueExpressionDriverI.H,v d8b99148c4ad 2011-09-28 09:13:24Z bgschaid $ 
+ ICE Revision: $Id: SampledSetValueExpressionDriverI.H,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -48,7 +48,7 @@ namespace Foam {
         FatalErrorIn("SampledSetValueExpressionDriver::pointSize()")
         << "sampledSets are a collection of points. So the 'cell' functionality should be used"
             << endl
-            << abort(FatalError);
+            << exit(FatalError);
         
         return 0;
     }
@@ -167,7 +167,7 @@ namespace Foam {
             FatalErrorIn("SampledSetValueExpressionDriver::sampleOrInterpolateInternal(const word &name)")
                 << "No valid result" 
                     << endl
-                    << abort(FatalError);
+                    << exit(FatalError);
         }
 
         return result;

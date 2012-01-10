@@ -28,7 +28,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
- ICE Revision: $Id$ 
+ ICE Revision: $Id: StoredExpressionResult.C,v 8e78c69634e2 2011-11-30 10:08:37Z bgschaid $ 
 \*---------------------------------------------------------------------------*/
 
 #include "StoredExpressionResult.H"
@@ -84,7 +84,7 @@ void StoredExpressionResult::operator=(const StoredExpressionResult& rhs)
     {
         FatalErrorIn("StoredExpressionResult::operator=(const StoredExpressionResult&)")
             << "Attempted assignment to self"
-            << abort(FatalError);
+            << exit(FatalError);
     }
 
     static_cast<ExpressionResult&>(*this)=rhs;
