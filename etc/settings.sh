@@ -47,10 +47,10 @@ _foamAddLib()
     while [ $# -ge 1 ]
     do
         export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-	if [ "$WM_ARCH_BASE" == "darwin" ]	    
-	then
-	    export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
-	fi
+        if [ "$WM_ARCH_BASE" = "darwin" ]
+        then
+            export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+        fi
         shift
     done
 }
@@ -70,7 +70,7 @@ _foamSource()
 }
 
 # location of the jobControl directory
-export FOAM_JOB_DIR=$WM_PROJECT_INST_DIR/jobControl
+export FOAM_JOB_DIR=$HOME/$WM_PROJECT/jobControl
 
 # wmake configuration
 export WM_DIR=$WM_PROJECT_DIR/wmake
@@ -273,8 +273,8 @@ SYSTEMOPENMPI)
     #          system openmpi installation.
 
     # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
-    export PINC=$OPENMPI_COMPILE_FLAGS
-    export PLIBS=$OPENMPI_LINK_FLAGS
+    export PINC="${OPENMPI_COMPILE_FLAGS}"
+    export PLIBS="${OPENMPI_LINK_FLAGS}"
 
     # No longer needed, but we keep this as a reference, just in case...
     #libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
@@ -480,8 +480,8 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.5 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.5/platforms/$WM_OPTIONS/etc/cmake-2.8.5.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
@@ -533,8 +533,10 @@ export MPI_BUFFER_SIZE
 
 # Load ParaView
 # ~~~~~~~~~~~~~
-[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.sh
+#[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ] && {
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.sh
+[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
 
