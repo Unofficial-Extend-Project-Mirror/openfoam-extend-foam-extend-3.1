@@ -79,7 +79,8 @@ void Foam::regionCouplePolyPatch::calcInterpolation() const
     {
         FatalErrorIn("void regionCouplePolyPatch::calcInterpolation() const")
             << "Shadow of regionCouple patch " << name()
-            << " named " << shadowPatchName() << " is not a regionCouple." << nl
+            << " named " << shadowPatchName()
+            << " is not a regionCouple." << nl
             << "This is not allowed.  Please check your mesh definition."
             << abort(FatalError);
     }
@@ -153,10 +154,17 @@ void Foam::regionCouplePolyPatch::calcReconFaceCellCentres() const
 }
 
 
+void Foam::regionCouplePolyPatch::clearGeom() const
+{
+    deleteDemandDrivenData(reconFaceCellCentresPtr_);
+}
+
+
 void Foam::regionCouplePolyPatch::clearOut() const
 {
+    clearGeom();
+
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(reconFaceCellCentresPtr_);
 }
 
 
@@ -172,13 +180,15 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     const polyBoundaryMesh& bm,
     const word& shadowRegionName,
     const word& shadowPatchName,
-    const bool attached
+    const bool attached,
+    const bool isWall
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowRegionName_(shadowRegionName),
     shadowPatchName_(shadowPatchName),
     attached_(attached),
+    isWall_(isWall),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -198,6 +208,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(dict.lookup("shadowRegion")),
     shadowPatchName_(dict.lookup("shadowPatch")),
     attached_(dict.lookup("attached")),
+    isWall_(dict.lookup("isWall")),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -215,6 +226,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     attached_(pp.attached_),
+    isWall_(pp.isWall_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -235,6 +247,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     attached_(pp.attached_),
+    isWall_(pp.isWall_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -273,7 +286,11 @@ void Foam::regionCouplePolyPatch::attach() const
     {
         attached_ = true;
         shadow().attach();
-        clearOut();
+
+        // Patch-to-patch interpolation does not need to be cleared,
+        // only face/cell centres and interpolation factors
+        // HJ, 6/Jun/2011
+        clearGeom();
     }
 }
 
@@ -284,7 +301,11 @@ void Foam::regionCouplePolyPatch::detach() const
     {
         attached_ = false;
         shadow().detach();
-        clearOut();
+
+        // Patch-to-patch interpolation does not need to be cleared,
+        // only face/cell centres and interpolation factors
+        // HJ, 6/Jun/2011
+        clearGeom();
     }
 }
 
@@ -331,6 +352,18 @@ Foam::regionCouplePolyPatch::reconFaceCellCentres() const
 }
 
 
+void Foam::regionCouplePolyPatch::initAddressing()
+{
+    polyPatch::initAddressing();
+}
+
+
+void Foam::regionCouplePolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
+}
+
+
 void Foam::regionCouplePolyPatch::initGeometry()
 {
     polyPatch::initGeometry();
@@ -339,6 +372,7 @@ void Foam::regionCouplePolyPatch::initGeometry()
 
 void Foam::regionCouplePolyPatch::calcGeometry()
 {
+    polyPatch::calcGeometry();
     // Reconstruct the cell face centres
 //     reconFaceCellCentres();
 }
@@ -427,6 +461,8 @@ void Foam::regionCouplePolyPatch::write(Ostream& os) const
         << shadowPatchName_ << token::END_STATEMENT << nl;
     os.writeKeyword("attached")
         << attached_ << token::END_STATEMENT << nl;
+    os.writeKeyword("isWall")
+        << isWall_ << token::END_STATEMENT << nl;
 }
 
 

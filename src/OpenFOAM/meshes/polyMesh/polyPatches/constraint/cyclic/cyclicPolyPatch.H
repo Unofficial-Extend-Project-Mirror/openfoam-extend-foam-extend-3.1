@@ -178,6 +178,12 @@ protected:
 
     // Protected Member functions
 
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
@@ -200,14 +206,6 @@ public:
 
     //- Runtime type information
     TypeName("cyclic");
-
-
-    // Static data
-
-        //- Relative tolerance (for geometric matching only).
-        //  Calculated as a factor of maximum edge length per face.
-        //  HJ, 21/Dec/2006
-        static const scalar areaMatchTol;
 
 
     // Constructors

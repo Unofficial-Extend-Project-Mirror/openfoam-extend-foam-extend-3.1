@@ -30,13 +30,14 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+if (mesh.moving())
 {
     volScalarField contErr = fvc::div(phi + fvc::meshPhi(U));
 
-    scalar sumLocalContErr = runTime.deltaT().value()*
+    sumLocalContErr = runTime.deltaT().value()*
         mag(contErr)().weightedAverage(mesh.V()).value();
 
-    scalar globalContErr = runTime.deltaT().value()*
+    globalContErr = runTime.deltaT().value()*
         contErr.weightedAverage(mesh.V()).value();
 
     cumulativeContErr += globalContErr;
@@ -47,5 +48,10 @@ Description
         << ", cumulative = " << cumulativeContErr
         << endl;
 }
+else
+{
+#   include "continuityErrs.H"
+}
+
 
 // ************************************************************************* //

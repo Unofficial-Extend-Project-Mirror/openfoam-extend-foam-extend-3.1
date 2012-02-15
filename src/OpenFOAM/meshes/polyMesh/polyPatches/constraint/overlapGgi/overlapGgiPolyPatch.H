@@ -147,6 +147,15 @@ protected:
 
     // Protected Member functions
 
+        //- Is the GGI active? (zone and shadow present)
+        bool active() const;
+
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
@@ -295,7 +304,7 @@ public:
         //- Return wedge angle
         scalar angle() const
         {
-            return 360.0/nCopies();
+            return 360.0/scalar(nCopies());
         }
 
         //- Return number of slave copies

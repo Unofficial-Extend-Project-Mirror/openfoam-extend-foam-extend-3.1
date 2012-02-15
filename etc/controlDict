@@ -121,6 +121,7 @@ DebugSwitches
     Gidaspow            0;
     GidaspowErgunWenYu  0;
     GidaspowSchillerNaumann 0;
+    ggi                 0;
     GradientDispersionRAS   0;
     Gulders             0;
     GuldersEGR          0;
@@ -411,6 +412,7 @@ DebugSwitches
     exponential         0;
     extendedLeastSquares    0;
     extendedLeastSquaresVectors 0;
+    faMesh              0;
     face                0;
     faceAreaPair        0;
     faceCoupleInfo      0;
@@ -471,7 +473,7 @@ DebugSwitches
     genericPatch        0;
     geomCellLooper      0;
     geometricSurfacePatch   0;
-    ggi                 0;
+    GGIInterpolation    0;
     global              0;
     globalMeshData      0;
     globalPoints        0;

@@ -41,6 +41,49 @@ namespace Foam
 }
 
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void Foam::ggiGAMGInterface::initFastReduce() const
+{
+    // Init should be executed only once
+    initReduce_ = true;
+
+    // Establish parallel comms pattern
+    if (!localParallel() && Pstream::parRun())
+    {
+        // Only master handles communication
+        if (Pstream::master())
+        {
+            receiveAddr_.setSize(Pstream::nProcs());
+            sendAddr_.setSize(Pstream::nProcs());
+
+            receiveAddr_[0] = zoneAddressing();
+
+            for (label procI = 1; procI < Pstream::nProcs(); procI++)
+            {
+                // Note: must use normal comms because the size of the
+                // communicated lists is unknown on the receiving side
+                // HJ, 4/Jun/2011
+
+                // Opt: reconsider mode of communication
+                IPstream ip(Pstream::scheduled, procI);
+
+                receiveAddr_[procI] = labelList(ip);
+
+                sendAddr_[procI] = labelList(ip);
+            }
+        }
+        else
+        {
+            // Opt: reconsider mode of communication
+            OPstream op(Pstream::scheduled, Pstream::masterNo());
+
+            op << zoneAddressing() << shadowInterface().zoneAddressing();
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::ggiGAMGInterface::ggiGAMGInterface
@@ -54,7 +97,10 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
     GAMGInterface(lduMesh),
     fineGgiInterface_(refCast<const ggiLduInterface>(fineInterface)),
     zoneSize_(0),
-    zoneAddressing_()
+    zoneAddressing_(),
+    initReduce_(false),
+    receiveAddr_(),
+    sendAddr_()
 {
     // Note.
     // All processors will do the same coarsening and then filter
@@ -134,10 +180,11 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
     );
 
     // Table of face-sets weights to be agglomerated
-    HashTable<SLList<SLList<scalar> >, label, Hash<label> > faceFaceWeightsTable
-    (
-        localExpandAddressing.size()
-    );
+    HashTable<SLList<SLList<scalar> >, label, Hash<label> >
+        faceFaceWeightsTable
+        (
+            localExpandAddressing.size()
+        );
 
     // Count the number of coarse faces
     label nCoarseFaces = 0;
@@ -221,6 +268,7 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                             faceFacesIter().append(ffI);
                             faceFaceWeightsIter().append(curNW);
                             nAgglomPairs++;
+
                             break;
                         }
                     }
@@ -436,7 +484,8 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                         contents[masterI] - procOffset*Pstream::myProcNo();
                     nProcFaces++;
 
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
                     SLList<scalar>::iterator weightsIter =
                         faceFaceWeightsIter().begin();
 
@@ -473,7 +522,7 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
-            // Note: maste processor index is irrelevant.  HJ, 1/Apr/2009
+            // Note: master processor index is irrelevant.  HJ, 1/Apr/2009
 
             SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
 
@@ -512,7 +561,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                         nbrsIter() - procOffset*Pstream::myProcNo();
                     nProcFaces++;
 
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
+
                     SLList<scalar>::iterator weightsIter =
                         faceFaceWeightsIter().begin();
 
@@ -639,6 +690,7 @@ const Foam::labelListList& Foam::ggiGAMGInterface::addressing() const
     FatalErrorIn("const labelListList& ggiGAMGInterface::addressing() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
+
     return labelListList::null();
 }
 
@@ -654,6 +706,7 @@ const Foam::scalarListList& Foam::ggiGAMGInterface::weights() const
     FatalErrorIn("const labelListList& ggiGAMGInterface::weights() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
+
     return scalarListList::null();
 }
 
@@ -676,9 +729,8 @@ void Foam::ggiGAMGInterface::initTransfer
     const unallocLabelList& interfaceData
 ) const
 {
-    // Label transfer is straight local
+    // Label transfer is local
     labelTransferBuffer_ = interfaceData;
-//     labelTransferBuffer_ = expand(interfaceData);
 }
 
 
@@ -701,9 +753,6 @@ void Foam::ggiGAMGInterface::initInternalFieldTransfer
 {
     // Label transfer is local without global reduction
     labelTransferBuffer_ = interfaceInternalField(iF);
-
-//     labelList pif = interfaceInternalField(iF);
-//     labelTransferBuffer_ = expand(pif);
 }
 
 
@@ -725,8 +774,14 @@ void Foam::ggiGAMGInterface::initInternalFieldTransfer
 {
     scalarField pif = interfaceInternalField(iF);
 
+    // New treatment.  HJ, 26/Jun/2011
+    fieldTransferBuffer_ = fastReduce(pif);
+
+    // Old treatment
+#if(0)
     // Expand the field, executing a reduce operation in init
     fieldTransferBuffer_ = expand(pif);
+#endif
 }
 
 

@@ -7,5 +7,6 @@ wmake libso fvMotionSolver
 wmake libso RBFMotionSolver
 wmake libso mesquiteMotionSolver
 (cd tetDecompositionMotionSolver ; ./Allwmake)
+wmake libso solidBodyMotion
 
 # ----------------------------------------------------------------- end-of-file

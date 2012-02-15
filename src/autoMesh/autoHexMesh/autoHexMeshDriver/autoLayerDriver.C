@@ -2332,7 +2332,7 @@ Foam::label Foam::autoLayerDriver::checkAndUnmark
     const addPatchCellLayer& addLayer,
     const dictionary& meshQualityDict,
     const indirectPrimitivePatch& pp,
-    const fvMesh& newMesh,
+    const polyMesh& newMesh,
 
     pointField& patchDisp,
     labelList& patchNLayers,
@@ -2975,7 +2975,8 @@ void Foam::autoLayerDriver::addLayers
             );
 
             const_cast<Time&>(mesh.time())++;
-            Info<< "Writing shrunk mesh to " << meshRefiner_.timeName() << endl;
+            Info<< "Writing shrunk mesh to " << meshRefiner_.timeName()
+                << endl;
 
             // See comment in autoSnapDriver why we should not remove meshPhi
             // using mesh.clearPout().
@@ -3055,7 +3056,7 @@ void Foam::autoLayerDriver::addLayers
         // With the stored topo changes we create a new mesh so we can
         // undo if neccesary.
 
-        autoPtr<fvMesh> newMeshPtr;
+        autoPtr<polyMesh> newMeshPtr;
         autoPtr<mapPolyMesh> map = meshMod.makeMesh
         (
             newMeshPtr,
@@ -3071,10 +3072,9 @@ void Foam::autoLayerDriver::addLayers
             mesh,           // original mesh
             true            // parallel sync
         );
-        fvMesh& newMesh = newMeshPtr();
+        polyMesh& newMesh = newMeshPtr();
 
-        //?neccesary? Update fields
-        newMesh.updateMesh(map);
+        // Update fields: removed.  HJ, 19/May/2011
 
         if (meshRefiner_.overwrite())
         {
@@ -3105,6 +3105,7 @@ void Foam::autoLayerDriver::addLayers
         {
             Info<< "Writing layer mesh to " << meshRefiner_.timeName() << endl;
             newMesh.write();
+
             cellSet addedCellSet
             (
                 newMesh,
