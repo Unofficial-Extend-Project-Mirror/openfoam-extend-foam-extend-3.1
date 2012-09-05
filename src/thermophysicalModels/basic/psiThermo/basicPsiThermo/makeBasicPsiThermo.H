@@ -83,6 +83,28 @@ addToRunTimeSelectionTable                                                    \
     fvMesh                                                                    \
 )
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define makeBasicExternalLibraryBasedThermo(Cthermo)       \
+                                                                              \
+typedef Cthermo     \
+    Cthermo;                          \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    Cthermo,                          \
+    #Cthermo, \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo,                          \
+    fvMesh                                                                    \
+)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
