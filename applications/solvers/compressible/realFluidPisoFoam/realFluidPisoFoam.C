@@ -27,6 +27,9 @@ Application
 
 Description
     Transient PISO solver for compressible, laminar or turbulent flow.
+   
+    CL: rhoPisoFoam with a changed pressure equation for non-perfect gas fluids
+    CL: see realFluid flag
 
 \*---------------------------------------------------------------------------*/
 
@@ -68,7 +71,7 @@ int main(int argc, char *argv[])
         #include "UEqn.H"
 
         // --- PISO loop
-        for (int corr = 1; corr <= nCorr; corr++)
+        for (int corr=1; corr<=nCorr; corr++)
         {
             #include "hEqn.H"
             #include "pEqn.H"
