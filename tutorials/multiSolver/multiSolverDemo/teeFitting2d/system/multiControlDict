@@ -32,7 +32,7 @@ solverDomains
         startTime       0;
         stopAt          endTime;
         endTime         0.1;
-        deltaT          0.01;
+        deltaT          0.2;
         writeControl    timeStep;
         writeInterval   1;
         storeFields     ( T );
@@ -44,7 +44,7 @@ solverDomains
         startTime       0;
         stopAt          endTime;
         endTime         0.1;
-        deltaT          0.01;
+        deltaT          0.2;
         writeControl    timeStep;
         writeInterval   1;
         storeFields     ( T );
@@ -54,7 +54,7 @@ solverDomains
         application     scalarTransportFoam;
         startFrom       latestTimeAllDomains;
         stopAt          elapsedTime;
-        elapsedTime     1;
+        elapsedTime     0.2;
         deltaT          0.1;
         writeControl    timeStep;
         writeInterval   1;
